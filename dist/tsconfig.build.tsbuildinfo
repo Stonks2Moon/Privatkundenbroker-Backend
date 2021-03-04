@@ -1366,13 +1366,18 @@
         "signature": "6135647589b66f6d9e9cec830acda3ab51312b1739a20c9fb206b743a0ebd056",
         "affectsGlobalScope": false
       },
+      "../src/interfaces/interfaces.ts": {
+        "version": "e4d15b3f06d425b3d0d2306c8575b3958607f97561d4dd4a0ecf66b971f43e6f",
+        "signature": "dbbfe553d8443f3d66b6941ec59730aa766419fdece43191eac6cb6b97853368",
+        "affectsGlobalScope": false
+      },
       "../src/app.service.ts": {
-        "version": "eaf8514ce110fa428a93a27408df4d06d133dbd9ed0a775c315ddfdd507853a9",
-        "signature": "653711fba8904aa27fd8911b63cf526e7b334e13a292da4cefdbbe179ac3f3f2",
+        "version": "4a8c84e80f0dbcc3fd9e2d0a8c0a72cdb69a5df15fc18de936749f0a1b531fbe",
+        "signature": "6297a7ac00f6ba9bf994516e5d5b074ac92204898bc9f820731de403967d0e53",
         "affectsGlobalScope": false
       },
       "../src/app.controller.ts": {
-        "version": "b8508f4e80dce64d4c0d544ed30863a2a96627d78d3bff0ada3b15d4170842eb",
+        "version": "a68a696068fb8cbbb7ef8c2c11eb972c0fc6b549edee8c01dafa3e7ad2440618",
         "signature": "2660404477cf0e4a838690aa3ad3153c0af85548123c87245709f973d530aa5f",
         "affectsGlobalScope": false
       },
@@ -3581,7 +3586,8 @@
         "../src/app.service.ts"
       ],
       "../src/app.service.ts": [
-        "../node_modules/@nestjs/common/index.d.ts"
+        "../node_modules/@nestjs/common/index.d.ts",
+        "../src/interfaces/interfaces.ts"
       ],
       "../src/main.ts": [
         "../node_modules/@nestjs/core/index.d.ts",
@@ -5028,6 +5034,9 @@
       "../src/app.controller.ts": [
         "../src/app.apiproperties.ts",
         "../src/app.service.ts"
+      ],
+      "../src/app.service.ts": [
+        "../src/interfaces/interfaces.ts"
       ]
     },
     "semanticDiagnosticsPerFile": []

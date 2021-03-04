@@ -21,7 +21,7 @@ let AppController = class AppController {
         this.appService = appService;
     }
     getHello() {
-        return this.appService.getHello();
+        return this.appService.getConfig();
     }
     async registerUser(registerUserProperties) {
         return new Promise(async function (resolve, reject) {

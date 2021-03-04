@@ -8,9 +8,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
+var passwordHash = require('password-hash');
+var mysql = require('mysql');
 let AppService = class AppService {
     getHello() {
         return 'Hello World!';
+    }
+    getConfig() {
+        var config = require('../config.json');
+        console.log(config.host);
+        return config;
+    }
+    createPerson(firstName, lastName, gender, birthday, biography) {
+        return new Promise(async function (resolve, reject) {
+            var connection = mysql.createConnection(this.getConfig());
+            connection.query('INSERT INTO `Person` (`PID`, `FirstName`, `LastName`, `Gender`, `Birthday`, `Biography`) VALUES (NULL, ?, ?, ?, ?, "")', [firstName, lastName, gender, birthday], function (error, results, fields) {
+                if (error) {
+                    resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+                }
+                ;
+                resolve({ success: true, message: "Person has been created", additionalInfo: { PID: results.insertId } });
+            });
+            connection.end();
+        });
     }
 };
 AppService = __decorate([
