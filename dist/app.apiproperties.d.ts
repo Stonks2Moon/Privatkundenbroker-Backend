@@ -16,3 +16,8 @@ export declare class loginWithPasswordHashQueryProperties {
     email: string;
     hashedPassword: string;
 }
+export declare class getNutzerQueryProperties {
+    email: string;
+    hashedPassword: string;
+    nutzerID: number;
+}

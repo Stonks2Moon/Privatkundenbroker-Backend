@@ -80,3 +80,22 @@ export class loginWithPasswordHashQueryProperties {
     hashedPassword: string;
 }
 
+export class getNutzerQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$057d3635$1$fefae8e41539b1ac3aafa1d04dfd274cbb723d5f"
+    })
+    hashedPassword: string;
+
+    @ApiProperty({
+        description: "NutzerID",
+        default: 1
+    })
+    nutzerID: number;
+}
