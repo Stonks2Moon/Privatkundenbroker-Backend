@@ -35,6 +35,12 @@ let AppController = class AppController {
             }
         }.bind(this));
     }
+    async getUser(getNutzerProperties) {
+        return new Promise(async function (resolve, reject) {
+            var getNutzerResult = await this.appService.getNutzer(getNutzerProperties.nutzerID);
+            resolve(JSON.stringify(getNutzerResult));
+        }.bind(this));
+    }
 };
 __decorate([
     common_1.Get(),
@@ -49,6 +55,13 @@ __decorate([
     __metadata("design:paramtypes", [app_apiproperties_1.registerUserQueryProperties]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "registerUser", null);
+__decorate([
+    common_1.Get("/getUser"),
+    __param(0, common_1.Query()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [app_apiproperties_1.getNutzerQueryProperties]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "getUser", null);
 AppController = __decorate([
     common_1.Controller(),
     __metadata("design:paramtypes", [app_service_1.AppService])

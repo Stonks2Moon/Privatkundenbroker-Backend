@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginWithPasswordHashQueryProperties = exports.loginWithPasswordQueryProperties = exports.registerUserQueryProperties = void 0;
+exports.getNutzerQueryProperties = exports.loginWithPasswordHashQueryProperties = exports.loginWithPasswordQueryProperties = exports.registerUserQueryProperties = void 0;
 const swagger_1 = require("@nestjs/swagger");
 class registerUserQueryProperties {
 }
@@ -91,4 +91,28 @@ __decorate([
     __metadata("design:type", String)
 ], loginWithPasswordHashQueryProperties.prototype, "hashedPassword", void 0);
 exports.loginWithPasswordHashQueryProperties = loginWithPasswordHashQueryProperties;
+class getNutzerQueryProperties {
+}
+__decorate([
+    swagger_1.ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    }),
+    __metadata("design:type", String)
+], getNutzerQueryProperties.prototype, "email", void 0);
+__decorate([
+    swagger_1.ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$057d3635$1$fefae8e41539b1ac3aafa1d04dfd274cbb723d5f"
+    }),
+    __metadata("design:type", String)
+], getNutzerQueryProperties.prototype, "hashedPassword", void 0);
+__decorate([
+    swagger_1.ApiProperty({
+        description: "NutzerID",
+        default: 1
+    }),
+    __metadata("design:type", Number)
+], getNutzerQueryProperties.prototype, "nutzerID", void 0);
+exports.getNutzerQueryProperties = getNutzerQueryProperties;
 //# sourceMappingURL=app.apiproperties.js.map

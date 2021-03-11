@@ -31,5 +31,17 @@ export class AppService {
     });
   }
 
+  getNutzer(nutzerID: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query("SELECT Nutzer.NutzerID, Vorname, Nachname, Email, Passwort, Strasse, Hausnummer, Postleitzahl, Ort FROM Nutzer JOIN Adresse ON Nutzer.NutzerID = Adresse.NutzerID WHERE Nutzer.NutzerID = ?", [nutzerID], function (error, results, fields) {
+        if (error) {
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        };
+        resolve({ success: true, message: "User has been received", data: results });
+      });
+      connection.end();
+    }.bind(this));
+  }
 
 }
