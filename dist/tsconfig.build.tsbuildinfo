@@ -1363,27 +1363,27 @@
       },
       "../src/app.apiproperties.ts": {
         "version": "df01472d7328f107c933c0993ea750060b900a74927acfd8a7b8b36c0fa107d2",
-        "signature": "632d615642c85fe7c35d5f33a7e658214391d378dcdc4438401a9c8474b3d532",
+        "signature": "6135647589b66f6d9e9cec830acda3ab51312b1739a20c9fb206b743a0ebd056",
         "affectsGlobalScope": false
       },
       "../src/interfaces/interfaces.ts": {
         "version": "e4d15b3f06d425b3d0d2306c8575b3958607f97561d4dd4a0ecf66b971f43e6f",
-        "signature": "0e8b54ae5178604758b9f3d4b7b174272c9e1213ee922c64358890d364387241",
+        "signature": "dbbfe553d8443f3d66b6941ec59730aa766419fdece43191eac6cb6b97853368",
         "affectsGlobalScope": false
       },
       "../src/app.service.ts": {
         "version": "a60c462ba472a53f8188f2951b3292193aae06114a7134f13855ac073364705a",
-        "signature": "0fcd501ce7c4d1c7000665f0ade1f3ac202f80be3f8e7275e98c067f268e5716",
+        "signature": "6297a7ac00f6ba9bf994516e5d5b074ac92204898bc9f820731de403967d0e53",
         "affectsGlobalScope": false
       },
       "../src/app.controller.ts": {
         "version": "b8508f4e80dce64d4c0d544ed30863a2a96627d78d3bff0ada3b15d4170842eb",
-        "signature": "e16603e11c38c1aa24f5303ff446d1beb6723cfb18a388a8d31ad04ffb781c5a",
+        "signature": "2660404477cf0e4a838690aa3ad3153c0af85548123c87245709f973d530aa5f",
         "affectsGlobalScope": false
       },
       "../src/app.module.ts": {
         "version": "319f8e45e370ba3d33f0887e3046096714959d3764fc68b444885cfdb9c101dd",
-        "signature": "9fc7f7b6ad854404973b8cba8e6d883f758237991968e9a3965d716d46f1da88",
+        "signature": "b82491e2990291580288c5602d4c017238977749d52b17391f0e45d9a29be644",
         "affectsGlobalScope": false
       },
       "../node_modules/@nestjs/core/adapters/http-adapter.d.ts": {
@@ -1568,7 +1568,7 @@
       },
       "../src/main.ts": {
         "version": "d34d66610c4b8a58634d677509d7ea47abb02ff9d383545805eb73dc8fc16cf7",
-        "signature": "f761c91419d0a89422a0004ef1a92929dd4d2d5e5c16758654d8b0467d1998c6",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/node/globals.d.ts": {
@@ -1805,46 +1805,6 @@
         "version": "9c4c395e927045b324877acdc4bfb95f128f36bc9f073266a2f0342495075a4f",
         "signature": "9c4c395e927045b324877acdc4bfb95f128f36bc9f073266a2f0342495075a4f",
         "affectsGlobalScope": false
-      },
-      "../node_modules/jest-diff/build/cleanupsemantic.d.ts": {
-        "version": "d8aab31ba8e618cc3eea10b0945de81cb93b7e8150a013a482332263b9305322",
-        "signature": "d8aab31ba8e618cc3eea10b0945de81cb93b7e8150a013a482332263b9305322",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/jest-diff/build/types.d.ts": {
-        "version": "69da61a7b5093dac77fa3bec8be95dcf9a74c95a0e9161edb98bb24e30e439d2",
-        "signature": "69da61a7b5093dac77fa3bec8be95dcf9a74c95a0e9161edb98bb24e30e439d2",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/jest-diff/build/difflines.d.ts": {
-        "version": "561eca7a381b96d6ccac6e4061e6d2ae53f5bc44203f3fd9f5b26864c32ae6e9",
-        "signature": "561eca7a381b96d6ccac6e4061e6d2ae53f5bc44203f3fd9f5b26864c32ae6e9",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/jest-diff/build/printdiffs.d.ts": {
-        "version": "62ea38627e3ebab429f7616812a9394d327c2bc271003dfba985de9b4137369f",
-        "signature": "62ea38627e3ebab429f7616812a9394d327c2bc271003dfba985de9b4137369f",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/jest-diff/build/index.d.ts": {
-        "version": "b4439890c168d646357928431100daac5cbdee1d345a34e6bf6eca9f3abe22bc",
-        "signature": "b4439890c168d646357928431100daac5cbdee1d345a34e6bf6eca9f3abe22bc",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/pretty-format/build/types.d.ts": {
-        "version": "5d72971a459517c44c1379dab9ed248e87a61ba0a1e0f25c9d67e1e640cd9a09",
-        "signature": "5d72971a459517c44c1379dab9ed248e87a61ba0a1e0f25c9d67e1e640cd9a09",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/pretty-format/build/index.d.ts": {
-        "version": "02d734976af36f4273d930bea88b3e62adf6b078cf120c1c63d49aa8d8427c5c",
-        "signature": "02d734976af36f4273d930bea88b3e62adf6b078cf120c1c63d49aa8d8427c5c",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@types/jest/index.d.ts": {
-        "version": "71f30fba971582dc744373cbc8b06c1eb64dc24a6ccbc9b457f94fb68c67cb4e",
-        "signature": "71f30fba971582dc744373cbc8b06c1eb64dc24a6ccbc9b457f94fb68c67cb4e",
-        "affectsGlobalScope": true
       }
     },
     "options": {
@@ -1860,8 +1820,7 @@
       "baseUrl": "..",
       "incremental": true,
       "types": [
-        "node",
-        "jest"
+        "node"
       ],
       "configFilePath": "../tsconfig.build.json"
     },
@@ -2588,10 +2547,6 @@
       "../node_modules/@nestjs/swagger/index.d.ts": [
         "../node_modules/@nestjs/swagger/dist/index.d.ts"
       ],
-      "../node_modules/@types/jest/index.d.ts": [
-        "../node_modules/jest-diff/build/index.d.ts",
-        "../node_modules/pretty-format/build/index.d.ts"
-      ],
       "../node_modules/@types/node/assert.d.ts": [
         "../node_modules/@types/node/assert.d.ts"
       ],
@@ -2822,23 +2777,6 @@
       "../node_modules/@types/node/zlib.d.ts": [
         "../node_modules/@types/node/stream.d.ts",
         "../node_modules/@types/node/zlib.d.ts"
-      ],
-      "../node_modules/jest-diff/build/difflines.d.ts": [
-        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
-        "../node_modules/jest-diff/build/types.d.ts"
-      ],
-      "../node_modules/jest-diff/build/index.d.ts": [
-        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
-        "../node_modules/jest-diff/build/difflines.d.ts",
-        "../node_modules/jest-diff/build/printdiffs.d.ts",
-        "../node_modules/jest-diff/build/types.d.ts"
-      ],
-      "../node_modules/jest-diff/build/printdiffs.d.ts": [
-        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
-        "../node_modules/jest-diff/build/types.d.ts"
-      ],
-      "../node_modules/pretty-format/build/index.d.ts": [
-        "../node_modules/pretty-format/build/types.d.ts"
       ],
       "../node_modules/rxjs/index.d.ts": [
         "../node_modules/rxjs/internal/asyncsubject.d.ts",
@@ -3883,10 +3821,6 @@
       "../node_modules/@nestjs/swagger/index.d.ts": [
         "../node_modules/@nestjs/swagger/dist/index.d.ts"
       ],
-      "../node_modules/@types/jest/index.d.ts": [
-        "../node_modules/jest-diff/build/index.d.ts",
-        "../node_modules/pretty-format/build/index.d.ts"
-      ],
       "../node_modules/@types/node/assert.d.ts": [
         "../node_modules/@types/node/assert.d.ts"
       ],
@@ -4117,23 +4051,6 @@
       "../node_modules/@types/node/zlib.d.ts": [
         "../node_modules/@types/node/stream.d.ts",
         "../node_modules/@types/node/zlib.d.ts"
-      ],
-      "../node_modules/jest-diff/build/difflines.d.ts": [
-        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
-        "../node_modules/jest-diff/build/types.d.ts"
-      ],
-      "../node_modules/jest-diff/build/index.d.ts": [
-        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
-        "../node_modules/jest-diff/build/difflines.d.ts",
-        "../node_modules/jest-diff/build/printdiffs.d.ts",
-        "../node_modules/jest-diff/build/types.d.ts"
-      ],
-      "../node_modules/jest-diff/build/printdiffs.d.ts": [
-        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
-        "../node_modules/jest-diff/build/types.d.ts"
-      ],
-      "../node_modules/pretty-format/build/index.d.ts": [
-        "../node_modules/pretty-format/build/types.d.ts"
       ],
       "../node_modules/rxjs/index.d.ts": [
         "../node_modules/rxjs/internal/asyncsubject.d.ts",

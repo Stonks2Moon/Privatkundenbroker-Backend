@@ -18,7 +18,7 @@ export class AppService {
   }
 
 
-  createPerson(firstName: string, lastName: string, gender: string, birthday: string, biography: string): Promise<callResult> {
+  createNutzer(firstName: string, lastName: string, gender: string, birthday: string, biography: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
       connection.query('INSERT INTO `Person` (`PID`, `FirstName`, `LastName`, `Gender`, `Birthday`, `Biography`) VALUES (NULL, ?, ?, ?, ?, "")', [firstName, lastName, gender, birthday], function (error, results, fields) {
