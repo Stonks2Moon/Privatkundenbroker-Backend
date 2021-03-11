@@ -20,7 +20,18 @@ export class AppController {
       if (createNutzerResult.success) {
         var createAddresseResult = await this.appService.createAdresse(createNutzerResult.additionalInfo.PID, registerUserProperties.strasse, registerUserProperties.hausnummer, registerUserProperties.postleitzahl, registerUserProperties.ort)
         createNutzerResult.additionalInfo.createAddressResult = createAddresseResult;
-        resolve(JSON.stringify(createNutzerResult));
+        if (createAddresseResult.success) {
+          var createDepotResult = await this.appService.createDepot(createNutzerResult.additionalInfo.PID)
+          if (createDepotResult.success) {
+            createNutzerResult.additionalInfo.createDepotResult = createDepotResult;
+            resolve(JSON.stringify(createNutzerResult));
+          } else {
+            resolve(JSON.stringify(createDepotResult));
+          }
+        } else {
+          resolve(JSON.stringify(createAddresseResult));
+        }
+        
       } else {
         resolve(JSON.stringify(createNutzerResult));
       }

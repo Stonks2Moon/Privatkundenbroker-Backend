@@ -4,5 +4,6 @@ export declare class AppService {
     getConfig(): any;
     createNutzer(email: string, password: string, firstName: string, lastName: string): Promise<callResult>;
     createAdresse(nutzerID: number, strasse: string, hausnummer: number, postleitzahl: string, ort: string): Promise<callResult>;
+    createDepot(nutzerID: number): Promise<callResult>;
     getNutzer(nutzerID: number): Promise<callResult>;
 }

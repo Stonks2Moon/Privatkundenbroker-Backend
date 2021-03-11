@@ -25,7 +25,7 @@ let AppService = class AppService {
             connection.query('INSERT INTO `Nutzer` (`NutzerID`, `Vorname`, `Nachname`, `Email`, `Passwort`) VALUES (NULL, ?, ?, ?, ?);', [firstName, lastName, email, hashedPassword], function (error, results, fields) {
                 if (error) {
                     if (error.code == "ER_DUP_ENTRY") {
-                        resolve({ success: false, message: "An user with this email already exists!" });
+                        resolve({ success: false, message: "An user with this email already exists! 🍔" });
                     }
                     else {
                         console.log(error);
@@ -45,7 +45,7 @@ let AppService = class AppService {
             connection.query('INSERT INTO `Adresse` (`NutzerID`, `Strasse`, `Hausnummer`, `Postleitzahl`, `Ort`) VALUES (?, ?, ?, ?, ?);', [nutzerID, strasse, hausnummer, postleitzahl, ort], function (error, results, fields) {
                 if (error) {
                     if (error.code == "ER_DUP_ENTRY") {
-                        resolve({ success: false, message: "An user with this email already exists!" });
+                        resolve({ success: false, message: "An adress for this user already exists!" });
                     }
                     else {
                         console.log(error);
@@ -54,6 +54,26 @@ let AppService = class AppService {
                 }
                 else {
                     resolve({ success: true, message: "Adress has been created" });
+                }
+            });
+            connection.end();
+        }.bind(this));
+    }
+    createDepot(nutzerID) {
+        return new Promise(async function (resolve, reject) {
+            var connection = mysql.createConnection(this.getConfig());
+            connection.query('INSERT INTO `Depot` (`DepotID`, `NutzerID`) VALUES (NULL, ?);', [nutzerID], function (error, results, fields) {
+                if (error) {
+                    if (error.code == "ER_DUP_ENTRY") {
+                        resolve({ success: false, message: "An depot for this user already exists!" });
+                    }
+                    else {
+                        console.log(error);
+                        resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+                    }
+                }
+                else {
+                    resolve({ success: true, message: "Depot has been created" });
                 }
             });
             connection.end();
