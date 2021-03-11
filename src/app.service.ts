@@ -17,6 +17,51 @@ export class AppService {
     return config; 
   }
 
+  loginWithPassword(email: string, password: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('SELECT * FROM Nutzer WHERE Email = ?', [email], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          if (results.length === 1) {
+            var hashedPassword = results[0].Passwort;
+
+            var passwordVerifyResult = passwordHash.verify(password, hashedPassword);
+
+            if (passwordVerifyResult) {             
+                resolve({ success: true, message: "Login successful", additionalInfo: {NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
+            } else {
+              resolve({ success: false, message: "Login failed. Wrong email or password!" });
+            }
+          } else {
+            resolve({ success: false, message: "Login failed. Wrong email or password!" });
+          }
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  loginWithPasswordHash(email: string, hashedPassword: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('SELECT * FROM Nutzer WHERE Email = ? And Passwort = ?', [email, hashedPassword], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          if (results.length === 1) {
+              resolve({ success: true, message: "Login successful", additionalInfo: {NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
+          } else {
+            resolve({ success: false, message: "Login failed. Wrong email or password-hash!" });
+          }
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
 
   createNutzer(firstName: string, lastName: string, gender: string, birthday: string, biography: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
