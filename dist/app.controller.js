@@ -28,7 +28,7 @@ let AppController = class AppController {
             var createNutzerResult = await this.appService.createNutzer(registerUserProperties.email, registerUserProperties.password, registerUserProperties.firstName, registerUserProperties.lastName);
             if (createNutzerResult.success) {
                 var createAddresseResult = await this.appService.createAdresse(createNutzerResult.additionalInfo.PID, registerUserProperties.strasse, registerUserProperties.hausnummer, registerUserProperties.postleitzahl, registerUserProperties.ort);
-                createNutzerResult.additionalInfo.createAddresseResult = createAddresseResult;
+                createNutzerResult.additionalInfo.createAddressResult = createAddresseResult;
                 resolve(JSON.stringify(createNutzerResult));
             }
             else {
