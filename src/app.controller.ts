@@ -15,13 +15,14 @@ export class AppController {
   @Post("/registerUser")
   async registerUser(@Query() registerUserProperties: registerUserQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
-      var createPersonResult = await this.appService.createPerson(registerUserProperties.firstName, registerUserProperties.lastName, registerUserProperties.gender, registerUserProperties.birthday);
+      var createNutzerResult = await this.appService.createNutzer(registerUserProperties.email, registerUserProperties.password, registerUserProperties.firstName, registerUserProperties.lastName);
 
-      if (createPersonResult.success) {
-        var createUserResult = await this.appService.createUser(createPersonResult.additionalInfo.PID, registerUserProperties.email, registerUserProperties.password)
-        resolve(JSON.stringify(createUserResult));
+      if (createNutzerResult.success) {
+        var createAddresseResult = await this.appService.createAdresse(createNutzerResult.additionalInfo.PID, registerUserProperties.strasse, registerUserProperties.hausnummer, registerUserProperties.postleitzahl, registerUserProperties.ort)
+        createNutzerResult.additionalInfo.createAddressResult = createAddresseResult;
+        resolve(JSON.stringify(createNutzerResult));
       } else {
-        resolve(JSON.stringify(createPersonResult));
+        resolve(JSON.stringify(createNutzerResult));
       }
     }.bind(this));
   }
