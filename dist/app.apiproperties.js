@@ -43,19 +43,32 @@ __decorate([
 ], registerUserQueryProperties.prototype, "lastName", void 0);
 __decorate([
     swagger_1.ApiProperty({
-        description: "Gender",
-        enum: ["m", "f", "x"],
-        default: "m"
+        description: "Strasse",
+        default: "Zezeallee"
     }),
     __metadata("design:type", String)
-], registerUserQueryProperties.prototype, "gender", void 0);
+], registerUserQueryProperties.prototype, "strasse", void 0);
 __decorate([
     swagger_1.ApiProperty({
-        description: "Birthday in the format YYYY-MM-DD",
-        default: "2000-01-01",
+        description: "Hausnummer",
+        default: "42"
     }),
     __metadata("design:type", String)
-], registerUserQueryProperties.prototype, "birthday", void 0);
+], registerUserQueryProperties.prototype, "hausnummer", void 0);
+__decorate([
+    swagger_1.ApiProperty({
+        description: "Postleitzahl",
+        default: "68161"
+    }),
+    __metadata("design:type", String)
+], registerUserQueryProperties.prototype, "postleitzahl", void 0);
+__decorate([
+    swagger_1.ApiProperty({
+        description: "Ort",
+        default: "Mannheim"
+    }),
+    __metadata("design:type", String)
+], registerUserQueryProperties.prototype, "ort", void 0);
 exports.registerUserQueryProperties = registerUserQueryProperties;
 class loginWithPasswordQueryProperties {
 }

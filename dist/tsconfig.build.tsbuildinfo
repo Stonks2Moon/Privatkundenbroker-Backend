@@ -1362,8 +1362,8 @@
         "affectsGlobalScope": false
       },
       "../src/app.apiproperties.ts": {
-        "version": "d1df5b74158b6fe0eddf356928bd36073e910b723832641312db12a8bd3d2d2c",
-        "signature": "db9f80ea20f2ed4b1ac683c79008537d59cf0373836f5f8c859cd844cbfaf270",
+        "version": "4cf6366652e2b4ddadf0e1929255d16c7e5b23560d9b2037927b8ff6ce70c914",
+        "signature": "4f3aad79b02baaf430d83c5cfb721785cc258b79d94d74ce962c63bbc4044eab",
         "affectsGlobalScope": false
       },
       "../src/interfaces/interfaces.ts": {
@@ -1372,13 +1372,13 @@
         "affectsGlobalScope": false
       },
       "../src/app.service.ts": {
-        "version": "078907c5effff6c934e188416c44e8c00f7fde9ae841d563194c0cc0e3e51cee",
-        "signature": "9472248f7a8c9e8acf8f36ad4b44f8e8fc680f6cfe080441d26274876bbcb470",
+        "version": "3494ae782ee40449bef43a218b44a160d22b088cf4fb528c8bfa2b2eb5d7711b",
+        "signature": "2eee51f3ebd6c03b4c6bea8a96736e1b4f7b85b544978bf4bb75bf3065607a5d",
         "affectsGlobalScope": false
       },
       "../src/app.controller.ts": {
-        "version": "fbab4659b05fc2333885e7fb512444df8e51df25d7fcb63dd6123e7e363ebd72",
-        "signature": "a973e0bd46fea08f41b13a3d811dd7eda3d780a33a13bb5849d902f3d5a8e82c",
+        "version": "d8b6de822fa34e83fc65137928a48c730d965fca6db93816f5a0d4519fda852d",
+        "signature": "2660404477cf0e4a838690aa3ad3153c0af85548123c87245709f973d530aa5f",
         "affectsGlobalScope": false
       },
       "../src/app.module.ts": {

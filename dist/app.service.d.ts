@@ -2,6 +2,7 @@ import { callResult } from './interfaces/interfaces';
 export declare class AppService {
     getHello(): string;
     getConfig(): any;
-    createNutzer(firstName: string, lastName: string, gender: string, birthday: string, biography: string): Promise<callResult>;
+    createNutzer(email: string, password: string, firstName: string, lastName: string): Promise<callResult>;
+    createAdresse(nutzerID: number, strasse: string, hausnummer: number, postleitzahl: string, ort: string): Promise<callResult>;
     getNutzer(nutzerID: number): Promise<callResult>;
 }

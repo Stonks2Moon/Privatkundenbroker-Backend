@@ -3,8 +3,10 @@ export declare class registerUserQueryProperties {
     password: string;
     firstName: string;
     lastName: string;
-    gender: string;
-    birthday: string;
+    strasse: string;
+    hausnummer: string;
+    postleitzahl: string;
+    ort: string;
 }
 export declare class loginWithPasswordQueryProperties {
     email: string;

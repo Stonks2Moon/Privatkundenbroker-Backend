@@ -25,18 +25,31 @@ export class registerUserQueryProperties {
     })
     lastName: string;
 
-    @ApiProperty({
-        description: "Gender",
-        enum: ["m", "f", "x"],
-        default: "m"
-    })
-    gender: string;
 
     @ApiProperty({
-        description: "Birthday in the format YYYY-MM-DD",
-        default: "2000-01-01",
+        description: "Strasse",
+        default: "Zezeallee"
     })
-    birthday: string;
+    strasse: string;
+
+    @ApiProperty({
+        description: "Hausnummer",
+        default: "42"
+    })
+    hausnummer: string;
+
+    @ApiProperty({
+        description: "Postleitzahl",
+        default: "68161"
+    })
+    postleitzahl: string;
+
+
+    @ApiProperty({
+        description: "Ort",
+        default: "Mannheim"
+    })
+    ort: string;
 }
 
 export class loginWithPasswordQueryProperties {

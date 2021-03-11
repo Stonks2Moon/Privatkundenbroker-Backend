@@ -18,18 +18,46 @@ let AppService = class AppService {
         var config = require('../config.json');
         return config;
     }
-    createNutzer(firstName, lastName, gender, birthday, biography) {
+    createNutzer(email, password, firstName, lastName) {
         return new Promise(async function (resolve, reject) {
+            var hashedPassword = passwordHash.generate(password);
             var connection = mysql.createConnection(this.getConfig());
-            connection.query('INSERT INTO `Person` (`PID`, `FirstName`, `LastName`, `Gender`, `Birthday`, `Biography`) VALUES (NULL, ?, ?, ?, ?, "")', [firstName, lastName, gender, birthday], function (error, results, fields) {
+            connection.query('INSERT INTO `Nutzer` (`NutzerID`, `Vorname`, `Nachname`, `Email`, `Passwort`) VALUES (NULL, ?, ?, ?, ?);', [firstName, lastName, email, hashedPassword], function (error, results, fields) {
                 if (error) {
-                    resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+                    if (error.code == "ER_DUP_ENTRY") {
+                        resolve({ success: false, message: "An user with this email already exists!" });
+                    }
+                    else {
+                        console.log(error);
+                        resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+                    }
                 }
-                ;
-                resolve({ success: true, message: "Person has been created", additionalInfo: { PID: results.insertId } });
+                else {
+                    resolve({ success: true, message: "Nutzer has been created", additionalInfo: { PID: results.insertId, hashedPassword: hashedPassword } });
+                }
             });
             connection.end();
-        });
+        }.bind(this));
+    }
+    createAdresse(nutzerID, strasse, hausnummer, postleitzahl, ort) {
+        return new Promise(async function (resolve, reject) {
+            var connection = mysql.createConnection(this.getConfig());
+            connection.query('INSERT INTO `Adresse` (`NutzerID`, `Strasse`, `Hausnummer`, `Postleitzahl`, `Ort`) VALUES (?, ?, ?, ?, ?);', [nutzerID, strasse, hausnummer, postleitzahl, ort], function (error, results, fields) {
+                if (error) {
+                    if (error.code == "ER_DUP_ENTRY") {
+                        resolve({ success: false, message: "An user with this email already exists!" });
+                    }
+                    else {
+                        console.log(error);
+                        resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+                    }
+                }
+                else {
+                    resolve({ success: true, message: "Adress has been created" });
+                }
+            });
+            connection.end();
+        }.bind(this));
     }
     getNutzer(nutzerID) {
         return new Promise(async function (resolve, reject) {
