@@ -1,7 +1,7 @@
-node_modules/
+#node_modules/
 config.json
 
-dist/*
-!/dist/v4
-!/dist/v5
-!/dist/v6
+#dist/*
+#!/dist/v4
+#!/dist/v5
+#!/dist/v6
