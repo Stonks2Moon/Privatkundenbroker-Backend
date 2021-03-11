@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common';
 import { AppService } from './app.service';
-import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, getNutzerQueryProperties } from './app.apiproperties';
+import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties} from './app.apiproperties';
 
 
 @Controller()
@@ -10,6 +10,33 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Get("/loginWithPassword")
+  async loginWithPassword(@Query() loginWithPasswordQueryProperties: loginWithPasswordQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordResult = await this.appService.loginWithPassword(loginWithPasswordQueryProperties.email, loginWithPasswordQueryProperties.password);
+      if (loginWithPasswordResult.success) {
+        var getNutzerResult = await this.appService.getNutzer(loginWithPasswordResult.additionalInfo.NutzerID);
+        resolve(JSON.stringify(getNutzerResult));
+      } else {
+        resolve(loginWithPasswordResult);
+      }
+    }.bind(this));
+  }
+
+  @Get("/loginWithPasswordHash")
+  async loginWithPasswordHash(@Query() loginWithPasswordHashQueryProperties: loginWithPasswordHashQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(loginWithPasswordHashQueryProperties.email, loginWithPasswordHashQueryProperties.hashedPassword);
+      
+      if (loginWithPasswordHashResult.success) {
+        var getNutzerResult = await this.appService.getNutzer(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        resolve(JSON.stringify(getNutzerResult));
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
   }
 
   @Post("/registerUser")
@@ -37,14 +64,4 @@ export class AppController {
       }
     }.bind(this));
   }
-
-  @Get("/getUser")
-  async getUser(@Query() getNutzerProperties: getNutzerQueryProperties): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
-      var getNutzerResult = await this.appService.getNutzer(getNutzerProperties.nutzerID);
-
-      resolve(JSON.stringify(getNutzerResult));
-    }.bind(this));
-  }
-
 }
