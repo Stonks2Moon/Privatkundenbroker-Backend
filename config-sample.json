@@ -1,7 +1,10 @@
 {
-  "host": "",
-  "port": 3306,
-  "user": "",
-  "password": "",
-  "database": ""
+  "database": {
+    "host": "",
+    "port": 13306,
+    "user": "",
+    "password": "",
+    "database": ""
+  },
+  "maxOrderAmount": 100
 }

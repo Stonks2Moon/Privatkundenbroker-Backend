@@ -14,7 +14,7 @@ export class AppService {
   getConfig() {
     // TODO
     var config = require('../config.json')
-    return config; 
+    return config.database;
   }
 
   loginWithPassword(email: string, password: string): Promise<callResult> {
@@ -130,6 +130,21 @@ export class AppService {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         };
         resolve({ success: true, message: "User has been received", data: results });
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+
+  updateAdressDataOfUser(nutzerID, strasse: string, hausnummer: number, postleitzahl: string, ort: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('UPDATE `Adresse` SET `Strasse` = ?, `Hausnummer` = ?, `Postleitzahl` = ?, `Ort` = ? WHERE `Adresse`.`NutzerID` = ?;', [strasse, hausnummer, postleitzahl, ort, nutzerID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        }
+        resolve({ success: true, message: "The adress of the logged in User has been updated" });
       });
       connection.end();
     }.bind(this));

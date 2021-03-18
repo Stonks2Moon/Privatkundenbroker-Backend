@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common';
 import { AppService } from './app.service';
-import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties} from './app.apiproperties';
+import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, updateAdressDataQueryProperties } from './app.apiproperties';
 
 
 @Controller()
@@ -64,4 +64,20 @@ export class AppController {
       }
     }.bind(this));
   }
+
+
+  @Put("/updateAdressDataOfUser")
+  async updateBiographieOfLoggedInUser(@Query() updateAdressDataQueryProperties: updateAdressDataQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordResult = await this.appService.loginWithPasswordHash(updateAdressDataQueryProperties.email, updateAdressDataQueryProperties.hashedPassword);
+
+      if (loginWithPasswordResult.success) {
+        var updateBiographieOfLoggedInUserResult = await this.appService.updateAdressDataOfUser(loginWithPasswordResult.additionalInfo.PID, updateAdressDataQueryProperties.strasse, updateAdressDataQueryProperties.hausnummer, updateAdressDataQueryProperties.postleitzahl, updateAdressDataQueryProperties.ort);
+        resolve(JSON.stringify(updateBiographieOfLoggedInUserResult));
+      } else {
+        resolve(loginWithPasswordResult);
+      }
+    }.bind(this));
+  }
+
 }

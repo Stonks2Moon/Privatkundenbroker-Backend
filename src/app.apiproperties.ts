@@ -79,3 +79,42 @@ export class loginWithPasswordHashQueryProperties {
     })
     hashedPassword: string;
 }
+
+export class updateAdressDataQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+    
+    @ApiProperty({
+        description: "Strasse",
+        default: "Zezeallee"
+    })
+    strasse: string;
+
+    @ApiProperty({
+        description: "Hausnummer",
+        default: "42"
+    })
+    hausnummer: string;
+
+    @ApiProperty({
+        description: "Postleitzahl",
+        default: "68161"
+    })
+    postleitzahl: string;
+
+
+    @ApiProperty({
+        description: "Ort",
+        default: "Mannheim"
+    })
+    ort: string;
+}
