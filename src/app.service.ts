@@ -129,7 +129,7 @@ export class AppService {
         if (error) {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         };
-        resolve({ success: true, message: "User has been received", data: results });
+        resolve({ success: true, message: "User has been received", data: results[0] });
       });
       connection.end();
     }.bind(this));
