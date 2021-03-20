@@ -36,13 +36,13 @@ export class registerUserQueryProperties {
         description: "Hausnummer",
         default: "42"
     })
-    hausnummer: string;
+    hausnummer: number;
 
     @ApiProperty({
         description: "Postleitzahl",
         default: "68161"
     })
-    postleitzahl: string;
+    postleitzahl: number;
 
 
     @ApiProperty({
@@ -103,13 +103,13 @@ export class updateAdressDataQueryProperties {
         description: "Hausnummer",
         default: "42"
     })
-    hausnummer: string;
+    hausnummer: number;
 
     @ApiProperty({
         description: "Postleitzahl",
         default: "68161"
     })
-    postleitzahl: string;
+    postleitzahl: number;
 
 
     @ApiProperty({
@@ -151,4 +151,36 @@ export class getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties {
         default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
     })
     hashedPassword: string;
+}
+
+export class createTransactionAsAdminQueryProperties {
+    @ApiProperty({
+        description: "Admin KEY",
+        default: "s3cr3tAdm1nK3y"
+    })
+    adminKey: string;
+
+    @ApiProperty({
+        description: "Nutzer ID",
+        default: "22"
+    })
+    userID: string;
+    
+    @ApiProperty({
+        description: "Description",
+        default: "Einzahlung"
+    })
+    description: string;
+
+    @ApiProperty({
+        description: "Value",
+        default: "100"
+    })
+    value: number;
+
+    @ApiProperty({
+        description: "Receipient",
+        default: "DE09500105171865232336"
+    })
+    receipient: string;
 }

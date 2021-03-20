@@ -83,7 +83,7 @@ export class AppService {
     }.bind(this));
   }
 
-  createAdresse(nutzerID: number, strasse: string, hausnummer: number, postleitzahl: string, ort: string) {
+  createAdresse(nutzerID: number, strasse: string, hausnummer: number, postleitzahl: string, ort: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
       connection.query('INSERT INTO `Adresse` (`NutzerID`, `Strasse`, `Hausnummer`, `Postleitzahl`, `Ort`) VALUES (?, ?, ?, ?, ?);', [nutzerID, strasse, hausnummer, postleitzahl, ort], function (error, results, fields) {
@@ -103,7 +103,7 @@ export class AppService {
 
   }
 
-  createDepot(nutzerID: number) {
+  createDepot(nutzerID: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
       connection.query('INSERT INTO `Depot` (`DepotID`, `NutzerID`) VALUES (NULL, ?);', [nutzerID], function (error, results, fields) {
@@ -122,7 +122,7 @@ export class AppService {
     }.bind(this));
   }
 
-  createVerrechnungskonto(nutzerID: number, IBAN: string) {
+  createVerrechnungskonto(nutzerID: number, IBAN: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
       connection.query('INSERT INTO `Verrechnungskonto` (`NutzerID`, `IBAN`) VALUES (?, ?);', [nutzerID, IBAN], function (error, results, fields) {
@@ -205,6 +205,21 @@ export class AppService {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         };
         resolve({ success: true, message: "Transactions received", data: results });
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  createTransactionAsAdmin(nutzerID: number, description: string, value: number, receipient: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('INSERT INTO `Transaktion` (`TransaktionsID`, `NutzerID`, `Beschreibung`, `Betrag`, `Datum`, `Zielkonto`) VALUES (NULL, ?, ?, ?, CURRENT_DATE( ), ?);', [nutzerID, description, value, receipient], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Transaction has been created" });
+        }
       });
       connection.end();
     }.bind(this));

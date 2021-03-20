@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common';
 import { AppService } from './app.service';
-import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties } from './app.apiproperties';
+import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, createTransactionAsAdminQueryProperties } from './app.apiproperties';
 
 
 @Controller()
@@ -120,4 +120,16 @@ export class AppController {
     }.bind(this));
   }
   
+  
+  @Post("/createTransactionAsAdmin")
+  async createTransactionAsAdmin(@Query() createTransactionAsAdminQueryProperties: createTransactionAsAdminQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      if(createTransactionAsAdminQueryProperties.adminKey == "s3cr3tAdm1nK3y"){
+        var createTransactionAsAdminResult = await this.appService.createTransactionAsAdmin(createTransactionAsAdminQueryProperties.userID, createTransactionAsAdminQueryProperties.description, createTransactionAsAdminQueryProperties.value, createTransactionAsAdminQueryProperties.receipient);
+        resolve(createTransactionAsAdminResult);
+      } else {
+        resolve({ success: false, message: "Wrong Admin Key"});
+      }
+    }.bind(this)); 
+  }
 }
