@@ -30,8 +30,8 @@ export class AppService {
 
             var passwordVerifyResult = passwordHash.verify(password, hashedPassword);
 
-            if (passwordVerifyResult) {             
-                resolve({ success: true, message: "Login successful", additionalInfo: {NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
+            if (passwordVerifyResult) {
+              resolve({ success: true, message: "Login successful", additionalInfo: { NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
             } else {
               resolve({ success: false, message: "Login failed. Wrong email or password!" });
             }
@@ -53,7 +53,7 @@ export class AppService {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
           if (results.length === 1) {
-              resolve({ success: true, message: "Login successful", additionalInfo: {NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
+            resolve({ success: true, message: "Login successful", additionalInfo: { NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
           } else {
             resolve({ success: false, message: "Login failed. Wrong email or password-hash!" });
           }
@@ -136,7 +136,7 @@ export class AppService {
   }
 
 
-  updateAdressDataOfUser(nutzerID, strasse: string, hausnummer: number, postleitzahl: string, ort: string): Promise<callResult> {
+  updateAdressDataOfUser(nutzerID: number, strasse: string, hausnummer: number, postleitzahl: string, ort: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
       connection.query('UPDATE `Adresse` SET `Strasse` = ?, `Hausnummer` = ?, `Postleitzahl` = ?, `Ort` = ? WHERE `Adresse`.`NutzerID` = ?;', [strasse, hausnummer, postleitzahl, ort, nutzerID], function (error, results, fields) {
@@ -145,6 +145,21 @@ export class AppService {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         }
         resolve({ success: true, message: "The adress of the logged in User has been updated" });
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  updatePasswordOfUser(nutzerID: number, newPassword: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var newPasswordHash = passwordHash.generate(newPassword);
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('UPDATE `Nutzer` SET `Passwort` = ? WHERE `Nutzer`.`NutzerID` = ?;', [newPasswordHash, nutzerID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        }
+        resolve({ success: true, message: "The password of the logged in User has been updated" });
       });
       connection.end();
     }.bind(this));
