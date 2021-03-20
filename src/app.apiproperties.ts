@@ -138,3 +138,17 @@ export class updatePasswordOfUserQueryProperties {
     })
     newPassword: string;
 }
+
+export class getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+}

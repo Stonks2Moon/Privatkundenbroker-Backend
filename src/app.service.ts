@@ -76,7 +76,7 @@ export class AppService {
             resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
           }
         } else {
-          resolve({ success: true, message: "Nutzer has been created", additionalInfo: { PID: results.insertId, hashedPassword: hashedPassword } });
+          resolve({ success: true, message: "Nutzer has been created", additionalInfo: { NutzerID: results.insertId, hashedPassword: hashedPassword } });
         }
       });
       connection.end();
@@ -122,6 +122,25 @@ export class AppService {
     }.bind(this));
   }
 
+  createVerrechnungskonto(nutzerID: number, IBAN: string) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('INSERT INTO `Verrechnungskonto` (`NutzerID`, `IBAN`) VALUES (?, ?);', [nutzerID, IBAN], function (error, results, fields) {
+        if (error) {
+          if (error.code == "ER_DUP_ENTRY") {
+            resolve({ success: false, message: "An Verrechnungskonto for this User or with this IBAN already exists!" });
+          } else {
+            console.log(error);
+            resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+          }
+        } else {
+          resolve({ success: true, message: "Verrechnungskonto has been created" });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
   getNutzer(nutzerID: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
@@ -160,6 +179,32 @@ export class AppService {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         }
         resolve({ success: true, message: "The password of the logged in User has been updated" });
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  getBalanceOfVerrechnungskonto(nutzerID: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query("SELECT SUM(Betrag) As Guthaben FROM `Transaktion` WHERE NutzerID = ?", [nutzerID], function (error, results, fields) {
+        if (error) {
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        };
+        resolve({ success: true, message: "Balance received", data: results[0] });
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  getLastTransactionsOfVerrechnungskonto(nutzerID: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query("SELECT * FROM `Transaktion` WHERE `NutzerID` = ?", [nutzerID], function (error, results, fields) {
+        if (error) {
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        };
+        resolve({ success: true, message: "Transactions received", data: results });
       });
       connection.end();
     }.bind(this));

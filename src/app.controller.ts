@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common';
 import { AppService } from './app.service';
-import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties } from './app.apiproperties';
+import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties } from './app.apiproperties';
 
 
 @Controller()
@@ -48,10 +48,17 @@ export class AppController {
         var createAddresseResult = await this.appService.createAdresse(createNutzerResult.additionalInfo.NutzerID, registerUserProperties.strasse, registerUserProperties.hausnummer, registerUserProperties.postleitzahl, registerUserProperties.ort)
         createNutzerResult.additionalInfo.createAddressResult = createAddresseResult;
         if (createAddresseResult.success) {
-          var createDepotResult = await this.appService.createDepot(createNutzerResult.additionalInfo.NutzerID)
+          var createDepotResult = await this.appService.createDepot(createNutzerResult.additionalInfo.NutzerID);
+          createNutzerResult.additionalInfo.createDepotResult = createDepotResult;
           if (createDepotResult.success) {
-            createNutzerResult.additionalInfo.createDepotResult = createDepotResult;
-            resolve(JSON.stringify(createNutzerResult));
+            var randomIBAN = "DE09" + (Math.random() * (999999999999999999 - 100000000000000000) + 100000000000000000);
+            var createVerrechnungskontoResult = await this.appService.createVerrechnungskonto(createNutzerResult.additionalInfo.NutzerID, randomIBAN);
+            createNutzerResult.additionalInfo.createVerrechnunskontoResult = createVerrechnungskontoResult;
+            if(createVerrechnungskontoResult.success) {
+              resolve(JSON.stringify(createNutzerResult));
+            } else {
+              resolve(JSON.stringify(createNutzerResult));
+            }
           } else {
             resolve(JSON.stringify(createDepotResult));
           }
@@ -94,4 +101,23 @@ export class AppController {
     }.bind(this));
   }
 
+  @Get("/getBalanceAndLastTransactionsOfVerrechnungskonto")
+  async getBalanceAndLastTransactionsOfVerrechnungskonto(@Query() getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties: getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties.email, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties.hashedPassword);
+      
+      if (loginWithPasswordHashResult.success) {
+        var getBalanceOfVerrechnungskontoResult = await this.appService.getBalanceOfVerrechnungskonto(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        
+        var getLastTransactionsOfVerrechnungskontoResult = await this.appService.getLastTransactionsOfVerrechnungskonto(loginWithPasswordHashResult.additionalInfo.NutzerID);
+
+        var getBalanceAndLastTransactionsOfVerrechnungskontoResult = {success: true, message: "Balance and Last TransactionRetrieved", data: { balance: getBalanceOfVerrechnungskontoResult.data.Guthaben, transactions: getLastTransactionsOfVerrechnungskontoResult.data }}
+        
+        resolve(JSON.stringify(getBalanceAndLastTransactionsOfVerrechnungskontoResult));
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+  
 }
