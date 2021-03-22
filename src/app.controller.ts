@@ -90,7 +90,7 @@ export class AppController {
   @Put("/updatePasswordOfUser")
   async updatePasswordOfUser(@Query() updatePasswordOfUserQueryProperties: updatePasswordOfUserQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
-      var loginWithPasswordResult = await this.appService.loginWithPasswordHash(updatePasswordOfUserQueryProperties.email, updatePasswordOfUserQueryProperties.hashedPassword);
+      var loginWithPasswordResult = await this.appService.loginWithPassword(updatePasswordOfUserQueryProperties.email, updatePasswordOfUserQueryProperties.oldPassword);
 
       if (loginWithPasswordResult.success) {
         var updatePasswordOfUserResult = await this.appService.updatePasswordOfUser(loginWithPasswordResult.additionalInfo.NutzerID, updatePasswordOfUserQueryProperties.newPassword);

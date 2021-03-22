@@ -177,8 +177,9 @@ export class AppService {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "The password of the logged in User has been updated", additionalInfo: { newPasswordHash: newPasswordHash } });
         }
-        resolve({ success: true, message: "The password of the logged in User has been updated" });
       });
       connection.end();
     }.bind(this));
