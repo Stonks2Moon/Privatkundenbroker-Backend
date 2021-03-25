@@ -184,3 +184,69 @@ export class createTransactionAsAdminQueryProperties {
     })
     receipient: string;
 }
+
+export class getAllSharesQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+}
+
+export class getPriceOfShareQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+
+    @ApiProperty({
+        description: "ShareID",
+        default: "6037e67c8407c737441517d6"
+    })
+    shareID: string;
+}
+
+export class getPriceDevlopmentOfShareQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+
+    @ApiProperty({
+        description: "ShareID",
+        default: "6037e67c8407c737441517d6"
+    })
+    shareID: string;
+
+    @ApiProperty({
+        description: "From",
+        default: "1615485267401"
+    })
+    from: number;
+
+    @ApiProperty({
+        description: "Until",
+        default: "1615456569032"
+    })
+    until: number;
+}

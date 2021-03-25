@@ -1,6 +1,15 @@
 import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common';
 import { AppService } from './app.service';
-import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, createTransactionAsAdminQueryProperties } from './app.apiproperties';
+import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
+  updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
+  createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getPriceOfShareQueryProperties, getPriceDevlopmentOfShareQueryProperties } from './app.apiproperties';
+import { ShareManager } from "moonstonks-boersenapi";
+
+
+const https =  require('https');
+
+
+
 
 
 @Controller()
@@ -131,5 +140,62 @@ export class AppController {
         resolve({ success: false, message: "Wrong Admin Key"});
       }
     }.bind(this)); 
+  }
+
+  //COMMUNICATION WITH BÖRSE-API
+
+  @Get("/getAllShares")
+  async getAllShares(@Query() getAllSharesQueryProperties: getAllSharesQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getAllSharesQueryProperties.email, getAllSharesQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+
+        var response = await ShareManager.getShares()
+        .then((res)=>JSON.stringify({ success: true, message: "All shares successfully retrieved", data: res}))
+        .catch((err)=>JSON.stringify({ success: false, message: "Failed to retrieve the shares", additionalInfo: err})); 
+
+        resolve(response);
+
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+
+  @Get("/getPriceOfShare")
+  async getPriceOfShare(@Query() getPriceOfShareQueryProperties: getPriceOfShareQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getPriceOfShareQueryProperties.email, getPriceOfShareQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+
+        var response = await ShareManager.getPrice(getPriceOfShareQueryProperties.shareID)
+        .then((res)=>JSON.stringify({ success: true, message: "Price for share successfully retrieved", data: res}))
+        .catch((err)=>JSON.stringify({ success: false, message: "Failed to retrieve the price of the share", additionalInfo: err})); 
+
+        resolve(response);
+
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+
+  @Get("/getPriceDevelopmentOfShare")
+  async getPriceDevelopmentOfShare(@Query() getPriceDevlopmentOfShareQueryProperties: getPriceDevlopmentOfShareQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getPriceDevlopmentOfShareQueryProperties.email, getPriceDevlopmentOfShareQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+
+
+        var response = await ShareManager.getPricesFromUntil(getPriceDevlopmentOfShareQueryProperties.shareID, getPriceDevlopmentOfShareQueryProperties.from, getPriceDevlopmentOfShareQueryProperties.until)
+        .then((res)=>JSON.stringify({ success: true, message: "Price development for share successfully retrieved", data: res}))
+        .catch((err)=>JSON.stringify({ success: false, message: "Failed to retrieve the price development of the share", additionalInfo: err})); 
+
+        resolve(response);
+
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
   }
 }
