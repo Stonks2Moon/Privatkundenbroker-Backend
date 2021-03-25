@@ -226,7 +226,6 @@ export class AppController {
 
           totalDepotBuyPrices += getDepotValuesResult.data[i].totalKaufpreis;
         }
-        console.log(allShares)
         
         resolve({success: true, message: "Depot values obtained", data: { balance: totalDepotValue, positions: getDepotValuesResult.data } });
 
