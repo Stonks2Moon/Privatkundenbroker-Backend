@@ -12,7 +12,6 @@ export class AppService {
   }
 
   getConfig() {
-    // TODO
     var config = require('../config.json')
     return config.database;
   }
