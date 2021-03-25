@@ -225,4 +225,19 @@ export class AppService {
     }.bind(this));
   }
 
+  getAllOwnedWertpapiereFromDatabase(nutzerID: number, depotID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('SELECT ISIN, AVG(Kaufpreis) AS avgKaufpreis, SUM(Kaufpreis) AS totalKaufpreis, COUNT(*) AS count FROM `Wertpapier` NATURAL JOIN Depot WHERE DepotID = ? AND NutzerID = ? GROUP BY ISIN', [depotID, nutzerID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Owned Wertpapiere have been obtained", data: results });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
 }
