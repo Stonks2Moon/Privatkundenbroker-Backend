@@ -305,6 +305,12 @@ export class buyOrderQueryProperties {
     hashedPassword: string;
 
     @ApiProperty({
+        description: "DepotID",
+        default: "9"
+    })
+    depotID: number;
+
+    @ApiProperty({
         description: "ShareID",
         default: "6037e67c8407c737441517d6"
     })
@@ -315,12 +321,6 @@ export class buyOrderQueryProperties {
         default: "Market"
     })
     type: string;
-
-    @ApiProperty({
-        description: "Price",
-        default: 20
-    })
-    price: number;
 
     @ApiProperty({
         description: "Amount",
