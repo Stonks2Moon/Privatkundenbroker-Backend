@@ -24,7 +24,7 @@ export class AppService {
   loginWithPassword(email: string, password: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
-      connection.query('SELECT * FROM Nutzer WHERE Email = ?', [email], function (error, results, fields) {
+      connection.query('SELECT * FROM Nutzer WHERE Email = ?', [email], async function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
@@ -35,7 +35,8 @@ export class AppService {
             var passwordVerifyResult = passwordHash.verify(password, hashedPassword);
 
             if (passwordVerifyResult) {
-              resolve({ success: true, message: "Login successful", additionalInfo: { NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
+              var depotIDsOfUser = await this._getDepotIDsOfUser(results[0].NutzerID);
+              resolve({ success: true, message: "Login successful", additionalInfo: { NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword, depotIDs: depotIDsOfUser } });
             } else {
               resolve({ success: false, message: "Login failed. Wrong email or password!" });
             }
@@ -43,7 +44,7 @@ export class AppService {
             resolve({ success: false, message: "Login failed. Wrong email or password!" });
           }
         }
-      });
+      }.bind(this));
       connection.end();
     }.bind(this));
   }
@@ -51,13 +52,15 @@ export class AppService {
   loginWithPasswordHash(email: string, hashedPassword: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
-      connection.query('SELECT * FROM Nutzer WHERE Email = ? And Passwort = ?', [email, hashedPassword], function (error, results, fields) {
+      connection.query('SELECT * FROM Nutzer WHERE Email = ? And Passwort = ?', [email, hashedPassword], async function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
           if (results.length === 1) {
-            resolve({ success: true, message: "Login successful", additionalInfo: { NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword } });
+            var depotIDsOfUser = await this._getDepotIDsOfUser(results[0].NutzerID);
+            
+            resolve({ success: true, message: "Login successful", additionalInfo: { NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword, depotIDs: depotIDsOfUser } });
           } else {
             resolve({ success: false, message: "Login failed. Wrong email or password-hash!" });
           }
@@ -148,12 +151,15 @@ export class AppService {
   getNutzer(nutzerID: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(this.getConfig());
-      connection.query("SELECT Nutzer.NutzerID, Vorname, Nachname, Email, Passwort, Strasse, Hausnummer, Postleitzahl, Ort FROM Nutzer JOIN Adresse ON Nutzer.NutzerID = Adresse.NutzerID WHERE Nutzer.NutzerID = ?", [nutzerID], function (error, results, fields) {
+      connection.query("SELECT Nutzer.NutzerID, Vorname, Nachname, Email, Passwort, Strasse, Hausnummer, Postleitzahl, Ort FROM Nutzer JOIN Adresse ON Nutzer.NutzerID = Adresse.NutzerID WHERE Nutzer.NutzerID = ?", [nutzerID], async function (error, results, fields) {
         if (error) {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
-        };
-        resolve({ success: true, message: "User has been received", data: results[0] });
-      });
+        } else {
+          var depotIDsOfUser = await this._getDepotIDsOfUser(results[0].NutzerID);
+          results[0].depotIDs = depotIDsOfUser;
+          resolve({ success: true, message: "User has been received", data: results[0] });
+        }
+      }.bind(this));
       connection.end();
     }.bind(this));
   }
@@ -252,7 +258,7 @@ export class AppService {
       var allShares = await ShareManager.getShares()
         .catch((err) => resolve({ success: false, message: "Failed to retrieve the shares", additionalInfo: err }));
 
-      var timestampOfLastNight = this.getTimestampOfLastNight();
+      var timestampOfLastNight = this._getTimestampOfLastNight();
 
       for (var i = 0; i < allShares.length; i++) {
         // TODO: Get price of last night
@@ -356,7 +362,7 @@ export class AppService {
     });
   }*/
 
-  getTimestampOfLastNight() {
+  _getTimestampOfLastNight() {
     var now = new Date;
     now.setHours(0);
     now.setMinutes(0);
@@ -365,5 +371,22 @@ export class AppService {
     return timestampOfLastNight;
   }
 
+  _getDepotIDsOfUser(userID: number) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(this.getConfig());
+      connection.query('SELECT * FROM `Depot` WHERE NutzerID = ?', [userID], function (error, results, fields) {
+        if (error) {
+          resolve([]);
+        } else {
+          var depotIDs = [];
+          for(var i = 0; i < results.length; i++) {
+            depotIDs.push(results[i].DepotID)
+          }
+          resolve(depotIDs);
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
 
 }
