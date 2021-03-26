@@ -249,7 +249,7 @@ export class AppController {
             break; 
           } 
           default: { 
-            resolve({success: false, message: "Please specify the type of buy order you'd like to place§"});
+            resolve({success: false, message: "Please specify the type of buy order you'd like to place"});
             break; 
           } 
        } 
