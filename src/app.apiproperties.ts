@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class registerUserQueryProperties {
     @ApiProperty({
@@ -269,4 +269,54 @@ export class getDepotValuesQueryProperties {
         default: "9"
     })
     depotID: number;
+}
+
+export class buyOrderQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+
+    @ApiProperty({
+        description: "ShareID",
+        default: "6037e67c8407c737441517d6"
+    })
+    shareID: string;
+
+    @ApiProperty({
+        description: "Type (f.e. Market, Stop Market, Limit or Stop Limit)",
+        default: "Market"
+    })
+    type: string;
+
+    @ApiProperty({
+        description: "Price",
+        default: "20"
+    })
+    price: number;
+
+    @ApiProperty({
+        description: "Amount",
+        default: "1"
+    })
+    amount: number;
+
+    @ApiPropertyOptional({
+        description: "Limit",
+        default: "18"
+    })
+    limit: number;
+
+    @ApiPropertyOptional({
+        description: "Stop",
+        default: "1"
+    })
+    stop: number;
 }
