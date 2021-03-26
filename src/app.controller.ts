@@ -4,7 +4,6 @@ import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWit
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getPriceOfShareQueryProperties, getPriceDevlopmentOfShareQueryProperties,
   getDepotValuesQueryProperties, buyOrderQueryProperties } from './app.apiproperties';
-import { ShareManager } from "moonstonks-boersenapi";
 
 @Controller()
 export class AppController {
@@ -136,8 +135,6 @@ export class AppController {
     }.bind(this)); 
   }
 
-  //COMMUNICATION WITH BÖRSE-API
-
   @Get("/getAllShares")
   async getAllShares(@Query() getAllSharesQueryProperties: getAllSharesQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
@@ -200,7 +197,7 @@ export class AppController {
           var totalDepotBuyPrices = 0;
   
           for(var i = 0; i<getDepotValuesResult.data.length; i++){
-            
+
             var thisPositionBoersenData = getAllSharesServiceResult.data.find(x => x.id === getDepotValuesResult.data[i].ISIN);
             getDepotValuesResult.data[i].name = thisPositionBoersenData.name;
             getDepotValuesResult.data[i].currentValuePerPosition = thisPositionBoersenData.price;
@@ -224,15 +221,35 @@ export class AppController {
     }.bind(this));
   }
 
-  @Get("/buyOrder")
+  @Post("/buyOrder")
   async buyOrderHandler(@Query() buyOrderQueryProperties: buyOrderQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(buyOrderQueryProperties.email, buyOrderQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
-  
-
-
-
+        
+        switch(buyOrderQueryProperties.type) { 
+          case "Market": { 
+            var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
+            resolve(buyMarketOrderResult);
+            break; 
+          } 
+          case "Stop Market": { 
+            //statements; 
+            break; 
+          } 
+          case "Limit": { 
+            //statements; 
+            break; 
+          } 
+          case "Stop Limit": { 
+            //statements; 
+            break; 
+          } 
+          default: { 
+            //statements; 
+            break; 
+          } 
+       } 
       } else {
         resolve(loginWithPasswordHashResult);
       }

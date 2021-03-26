@@ -301,4 +301,10 @@ export class buyOrderQueryProperties {
         default: "20"
     })
     price: number;
+
+    @ApiProperty({
+        description: "Amount",
+        default: "1"
+    })
+    amount: number;
 }

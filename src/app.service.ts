@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { callResult } from './interfaces/interfaces';
-import { ShareManager } from "moonstonks-boersenapi";
+import { ShareManager, BörsenAPI, OrderManager } from "moonstonks-boersenapi";
 
 
 var passwordHash = require('password-hash');
 var mysql = require('mysql');
+
+const api = new BörsenAPI('moonstonks token');
+const orderManager: OrderManager = new OrderManager(api, 'onPlace', 'onMatch', 'onComplete', 'onDelete')
 
 @Injectable()
 export class AppService {
@@ -254,22 +257,27 @@ export class AppService {
   getPriceOfShareService(shareID: string): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
 
-      var response = await ShareManager.getPrice(shareID)
+      await ShareManager.getPrice(shareID)
       .then((res)=>resolve({ success: true, message: "Price for share successfully retrieved", data: res}))
       .catch((err)=>resolve({ success: false, message: "Failed to retrieve the price of the share", additionalInfo: err})); 
-
-      resolve(response);
     }.bind(this));
   }
 
   getPriceDevelopmentOfShareService(shareID: string, from: number, until: number): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
 
-      var response = await ShareManager.getPricesFromUntil(shareID, from, until)
+      await ShareManager.getPricesFromUntil(shareID, from, until)
       .then((res)=>resolve({ success: true, message: "Price development for share successfully retrieved", data: res}))
       .catch((err)=>resolve({ success: false, message: "Failed to retrieve the price development of the share", additionalInfo: err})); 
+    }.bind(this));
+  }
+  
+  buyMarketOrder(shareID: string, amount: number): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
 
-      resolve(response);
+      await orderManager.placeBuyMarketOrder(shareID, amount)
+      .then((res)=>resolve({ success: true, message: "The buy market order was successfully placed", data: res}))
+      .catch((err)=>resolve({ success: false, message: "Failed to place the buy market order", additionalInfo: err})); 
     }.bind(this));
   }
 
