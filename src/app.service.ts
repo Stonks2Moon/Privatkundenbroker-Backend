@@ -65,7 +65,7 @@ export class AppService {
             resolve({ success: false, message: "Login failed. Wrong email or password-hash!" });
           }
         }
-      });
+      }.bind(this));
       connection.end();
     }.bind(this));
   }
@@ -261,7 +261,6 @@ export class AppService {
       var timestampOfLastNight = this._getTimestampOfLastNight();
 
       for (var i = 0; i < allShares.length; i++) {
-        // TODO: Get price of last night
         var priceOfLastNight = await this.getPriceOfLastValueBeforeTimestamp(allShares[i].id, timestampOfLastNight);
         if(priceOfLastNight !== undefined){
           allShares[i].priceOfLastNight = priceOfLastNight.price;
@@ -356,11 +355,13 @@ export class AppService {
     }.bind(this));
   }
 
-  /*checkIfMarketIsOpen() {
+  checkIfMarketIsOpen() {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log(MarketManager.isOpen());
+      await MarketManager.isOpen()
+        .then((res) => resolve({ success: true, message: "The buy stop limit order was successfully placed", data: { marketIsOpen: res } }))
+        .catch((err) => resolve({ success: false, message: "Failed to check if Market is Open", additionalInfo: err }));
     });
-  }*/
+  }
 
   _getTimestampOfLastNight() {
     var now = new Date;

@@ -3,7 +3,7 @@ import { AppService } from './app.service';
 import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties,
-  getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties } from './app.apiproperties';
+  getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, checkIfMarketIsOpenQueryProperties } from './app.apiproperties';
 
 @Controller()
 export class AppController {
@@ -270,7 +270,20 @@ export class AppController {
     }.bind(this));
   }
 
+  @Get("/checkIfMarketIsOpen")
+  async checkIfMarketIsOpen(@Query() checkIfMarketIsOpenQueryProperties: checkIfMarketIsOpenQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(checkIfMarketIsOpenQueryProperties.email, checkIfMarketIsOpenQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
 
+        var checkIfMarketIsOpenResult = await this.appService.checkIfMarketIsOpen();
+        resolve(checkIfMarketIsOpenResult);
+
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
 
 }
 
