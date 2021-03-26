@@ -6,5 +6,6 @@
     "password": "",
     "database": ""
   },
-  "maxOrderAmount": 100
+  "maxOrderAmount": 100,
+  "MoonAuthenticationToken": ""
 }
