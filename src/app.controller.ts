@@ -203,6 +203,9 @@ export class AppController {
   @Get("/getDepotValues")
   async getDepotValues(@Query() getDepotValuesQueryProperties: getDepotValuesQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
+
+      this.appService.checkIfMarketIsOpen();
+
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getDepotValuesQueryProperties.email, getDepotValuesQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
 

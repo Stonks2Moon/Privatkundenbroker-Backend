@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { callResult } from './interfaces/interfaces';
+import { MarketManager } from "moonstonks-boersenapi";
 
 
 var passwordHash = require('password-hash');
@@ -238,6 +239,12 @@ export class AppService {
       });
       connection.end();
     }.bind(this));
+  }
+
+  checkIfMarketIsOpen() {
+    return new Promise<callResult>(async function (resolve, reject) {
+      console.log(MarketManager.isOpen());
+    });
   }
 
 }
