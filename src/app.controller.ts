@@ -166,10 +166,8 @@ export class AppController {
     return new Promise<string>(async function (resolve, reject) {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getPriceOfShareQueryProperties.email, getPriceOfShareQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
-
-        var getPriceOfShareServiceResult = await this.appService.getPriceOfShareService();
+        var getPriceOfShareServiceResult = await this.appService.getPriceOfShareService(getPriceOfShareQueryProperties.shareID);
         resolve(getPriceOfShareServiceResult);
-
       } else {
         resolve(loginWithPasswordHashResult);
       }
@@ -182,7 +180,7 @@ export class AppController {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getPriceDevlopmentOfShareQueryProperties.email, getPriceDevlopmentOfShareQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
 
-        var getPriceDevelopmentOfShareResult = await this.appService.getPriceDevelopmentOfShareService();
+        var getPriceDevelopmentOfShareResult = await this.appService.getPriceDevelopmentOfShareService(getPriceDevlopmentOfShareQueryProperties.shareID, getPriceDevlopmentOfShareQueryProperties.from, getPriceDevlopmentOfShareQueryProperties.until);
         resolve(getPriceDevelopmentOfShareResult);
 
       } else {

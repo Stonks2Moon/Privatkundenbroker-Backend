@@ -312,7 +312,6 @@ export class AppService {
 
   getPriceDevelopmentOfShareService(shareID: string, from: number, until: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
-
       await ShareManager.getPricesFromUntil(shareID, from, until)
         .then((res) => resolve({ success: true, message: "Price development for share successfully retrieved", data: res }))
         .catch((err) => resolve({ success: false, message: "Failed to retrieve the price development of the share", additionalInfo: err }));
