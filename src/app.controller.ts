@@ -234,19 +234,22 @@ export class AppController {
             break; 
           } 
           case "Stop Market": { 
-            //statements; 
+            var buyStopMarketOrderResult = await this.appService.buyStopMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.stop);
+            resolve(buyStopMarketOrderResult);
             break; 
           } 
           case "Limit": { 
-            //statements; 
+            var buyLimitOrderResult = await this.appService.buyLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit);
+            resolve(buyLimitOrderResult);
             break; 
           } 
           case "Stop Limit": { 
-            //statements; 
+            var buyStopLimitOrderResult = await this.appService.buyStopLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, buyOrderQueryProperties.stop);
+            resolve(buyStopLimitOrderResult);
             break; 
           } 
           default: { 
-            //statements; 
+            resolve({success: false, message: "Please specify the type of buy order you'd like to place§"});
             break; 
           } 
        } 

@@ -281,4 +281,31 @@ export class AppService {
     }.bind(this));
   }
 
+  buyStopMarketOrder(shareID: string, amount: number, stop:number): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+
+      await orderManager.placeBuyStopMarketOrder(shareID, amount, stop)
+      .then((res)=>resolve({ success: true, message: "The buy stop market order was successfully placed", data: res}))
+      .catch((err)=>resolve({ success: false, message: "Failed to place the buy stop market order", additionalInfo: err})); 
+    }.bind(this));
+  }
+
+  buyLimitOrder(shareID: string, amount: number, limit:number): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+
+      await orderManager.placeBuyLimitOrder(shareID, amount, limit)
+      .then((res)=>resolve({ success: true, message: "The buy limit order was successfully placed", data: res}))
+      .catch((err)=>resolve({ success: false, message: "Failed to place the buy limit order", additionalInfo: err})); 
+    }.bind(this));
+  }
+
+  buyStopLimitOrder(shareID: string, amount: number, limit:number,  stop:number): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+
+      await orderManager.placeBuyStopLimitOrder(shareID, amount, limit, stop)
+      .then((res)=>resolve({ success: true, message: "The buy stop limit order was successfully placed", data: res}))
+      .catch((err)=>resolve({ success: false, message: "Failed to place the buy stop limit order", additionalInfo: err})); 
+    }.bind(this));
+  }
+
 }

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class registerUserQueryProperties {
     @ApiProperty({
@@ -291,7 +291,7 @@ export class buyOrderQueryProperties {
     shareID: string;
 
     @ApiProperty({
-        description: "Type",
+        description: "Type (f.e. Market, Stop Market, Limit or Stop Limit)",
         default: "Market"
     })
     type: string;
@@ -307,4 +307,16 @@ export class buyOrderQueryProperties {
         default: "1"
     })
     amount: number;
+
+    @ApiPropertyOptional({
+        description: "Limit",
+        default: "18"
+    })
+    limit: number;
+
+    @ApiPropertyOptional({
+        description: "Stop",
+        default: "1"
+    })
+    stop: number;
 }
