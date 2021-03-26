@@ -272,7 +272,9 @@ export class AppService {
 
       var timestampOfNightSevenDaysBeforeTimestamp = timestamp - 86400000 * 7;
 
-      var pricesList = await ShareManager.getPricesFromUntil(shareID, timestampOfNightSevenDaysBeforeTimestamp, timestamp);
+      var pricesList = await ShareManager.getPrices(shareID, {
+        from: timestampOfNightSevenDaysBeforeTimestamp,
+        until: timestamp });
       resolve(pricesList[pricesList.length-1]);
     }.bind(this));
   }
@@ -306,7 +308,10 @@ export class AppService {
 
   getPriceDevelopmentOfShareService(shareID: string, from: number, until: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
-      await ShareManager.getPricesFromUntil(shareID, Number(from), Number(until))
+      await ShareManager.getPrices(shareID, {
+       from: Number(from),
+       until: Number(until)
+      })
         .then((res) => resolve({ success: true, message: "Price development for share successfully retrieved", data: res }))
         .catch((err) => resolve({ success: false, message: "Failed to retrieve the price development of the share", additionalInfo: err }));
     }.bind(this));
