@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { callResult } from './interfaces/interfaces';
 import { ShareManager, BörsenAPI, OrderManager, MarketManager } from "moonstonks-boersenapi";
+import { getAllSharesQueryProperties } from './app.apiproperties';
 
 
 var passwordHash = require('password-hash');
@@ -245,8 +246,8 @@ export class AppService {
   }
 
 
-  getAllSharesService(): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
+  getAllSharesService(): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
 
       var allShares = await ShareManager.getShares()
         .catch((err) => resolve({ success: false, message: "Failed to retrieve the shares", additionalInfo: err }));
@@ -277,8 +278,26 @@ export class AppService {
     }.bind(this));
   }
 
-  getPriceOfShareService(shareID: string): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
+  getShare(shareID: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var allShares = await this.getAllSharesService();
+      
+      if(allShares.success = true){
+        var share = allShares.data.find(x => x.id === shareID)
+        if(share !== undefined){
+          resolve({success: true, message: "Share has been obtained", data: share});
+        } else {
+          resolve({success: false, message: "Share not found" });
+        }
+      } else {
+        resolve(allShares);
+      }
+
+    }.bind(this));
+  }
+
+  getPriceOfShareService(shareID: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
 
       await ShareManager.getPrice(shareID)
         .then((res) => resolve({ success: true, message: "Price for share successfully retrieved", data: res }))
@@ -286,8 +305,8 @@ export class AppService {
     }.bind(this));
   }
 
-  getPriceDevelopmentOfShareService(shareID: string, from: number, until: number): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
+  getPriceDevelopmentOfShareService(shareID: string, from: number, until: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
 
       await ShareManager.getPricesFromUntil(shareID, from, until)
         .then((res) => resolve({ success: true, message: "Price development for share successfully retrieved", data: res }))
@@ -295,8 +314,8 @@ export class AppService {
     }.bind(this));
   }
 
-  buyMarketOrder(shareID: string, amount: number): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
+  buyMarketOrder(shareID: string, amount: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
 
       await orderManager.placeBuyMarketOrder(shareID, amount)
         .then((res) => resolve({ success: true, message: "The buy market order was successfully placed", data: res }))
@@ -304,8 +323,8 @@ export class AppService {
     }.bind(this));
   }
 
-  buyStopMarketOrder(shareID: string, amount: number, stop: number): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
+  buyStopMarketOrder(shareID: string, amount: number, stop: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
 
       await orderManager.placeBuyStopMarketOrder(shareID, amount, stop)
         .then((res) => resolve({ success: true, message: "The buy stop market order was successfully placed", data: res }))
@@ -313,8 +332,8 @@ export class AppService {
     }.bind(this));
   }
 
-  buyLimitOrder(shareID: string, amount: number, limit: number): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
+  buyLimitOrder(shareID: string, amount: number, limit: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
 
       await orderManager.placeBuyLimitOrder(shareID, amount, limit)
         .then((res) => resolve({ success: true, message: "The buy limit order was successfully placed", data: res }))
@@ -322,8 +341,8 @@ export class AppService {
     }.bind(this));
   }
 
-  buyStopLimitOrder(shareID: string, amount: number, limit: number, stop: number): Promise<string> {
-    return new Promise<string>(async function (resolve, reject) {
+  buyStopLimitOrder(shareID: string, amount: number, limit: number, stop: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
 
       await orderManager.placeBuyStopLimitOrder(shareID, amount, limit, stop)
         .then((res) => resolve({ success: true, message: "The buy stop limit order was successfully placed", data: res }))

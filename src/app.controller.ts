@@ -2,8 +2,8 @@ import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common'
 import { AppService } from './app.service';
 import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
-  createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getPriceOfShareQueryProperties, getPriceDevlopmentOfShareQueryProperties,
-  getDepotValuesQueryProperties, buyOrderQueryProperties } from './app.apiproperties';
+  createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties,
+  getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties } from './app.apiproperties';
 
 @Controller()
 export class AppController {
@@ -140,10 +140,21 @@ export class AppController {
     return new Promise<string>(async function (resolve, reject) {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getAllSharesQueryProperties.email, getAllSharesQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
-
         var getAllSharesServiceResult = await this.appService.getAllSharesService();
         resolve(getAllSharesServiceResult);
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
 
+  @Get("/getShare")
+  async getShare(@Query() getShareQueryProperties: getShareQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getShareQueryProperties.email, getShareQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+        var getShareResult = await this.appService.getShare(getShareQueryProperties.shareID);
+        resolve(getShareResult);
       } else {
         resolve(loginWithPasswordHashResult);
       }

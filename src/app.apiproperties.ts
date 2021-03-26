@@ -199,6 +199,26 @@ export class getAllSharesQueryProperties {
     hashedPassword: string;
 }
 
+export class getShareQueryProperties{
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+
+    @ApiProperty({
+        description: "ShareID",
+        default: "6037e67c8407c737441517d6"
+    })
+    shareID: string;
+}
+
 export class getPriceOfShareQueryProperties {
     @ApiProperty({
         description: "EMail",
