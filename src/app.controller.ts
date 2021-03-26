@@ -3,15 +3,8 @@ import { AppService } from './app.service';
 import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getPriceOfShareQueryProperties, getPriceDevlopmentOfShareQueryProperties,
-  getDepotValuesQueryProperties } from './app.apiproperties';
+  getDepotValuesQueryProperties, buyOrderQueryProperties } from './app.apiproperties';
 import { ShareManager } from "moonstonks-boersenapi";
-
-
-const https =  require('https');
-
-
-
-
 
 @Controller()
 export class AppController {
@@ -151,11 +144,8 @@ export class AppController {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getAllSharesQueryProperties.email, getAllSharesQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
 
-        var response = await ShareManager.getShares()
-        .then((res)=>JSON.stringify({ success: true, message: "All shares successfully retrieved", data: res}))
-        .catch((err)=>JSON.stringify({ success: false, message: "Failed to retrieve the shares", additionalInfo: err})); 
-
-        resolve(response);
+        var getAllSharesServiceResult = await this.appService.getAllSharesService();
+        resolve(getAllSharesServiceResult);
 
       } else {
         resolve(loginWithPasswordHashResult);
@@ -169,11 +159,8 @@ export class AppController {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getPriceOfShareQueryProperties.email, getPriceOfShareQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
 
-        var response = await ShareManager.getPrice(getPriceOfShareQueryProperties.shareID)
-        .then((res)=>JSON.stringify({ success: true, message: "Price for share successfully retrieved", data: res}))
-        .catch((err)=>JSON.stringify({ success: false, message: "Failed to retrieve the price of the share", additionalInfo: err})); 
-
-        resolve(response);
+        var getPriceOfShareServiceResult = await this.appService.getPriceOfShareService();
+        resolve(getPriceOfShareServiceResult);
 
       } else {
         resolve(loginWithPasswordHashResult);
@@ -187,12 +174,8 @@ export class AppController {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getPriceDevlopmentOfShareQueryProperties.email, getPriceDevlopmentOfShareQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
 
-
-        var response = await ShareManager.getPricesFromUntil(getPriceDevlopmentOfShareQueryProperties.shareID, getPriceDevlopmentOfShareQueryProperties.from, getPriceDevlopmentOfShareQueryProperties.until)
-        .then((res)=>JSON.stringify({ success: true, message: "Price development for share successfully retrieved", data: res}))
-        .catch((err)=>JSON.stringify({ success: false, message: "Failed to retrieve the price development of the share", additionalInfo: err})); 
-
-        resolve(response);
+        var getPriceDevelopmentOfShareResult = await this.appService.getPriceDevelopmentOfShareService();
+        resolve(getPriceDevelopmentOfShareResult);
 
       } else {
         resolve(loginWithPasswordHashResult);
@@ -210,28 +193,55 @@ export class AppController {
         var getDepotValuesResult = await this.appService.getAllOwnedWertpapiereFromDatabase(loginWithPasswordHashResult.additionalInfo.NutzerID, getDepotValuesQueryProperties.depotID);
         
         // TODO: Loop over positions and load value from Boerse
-        var allShares = await ShareManager.getShares();
-        var totalDepotValue = 0;
-        var totalDepotBuyPrices = 0;
-
-        for(var i = 0; i<getDepotValuesResult.data.length; i++){
-          var thisPositionBoersenData = allShares.find(x => x.id === getDepotValuesResult.data[i].ISIN);
-          getDepotValuesResult.data[i].name = thisPositionBoersenData.name;
-          getDepotValuesResult.data[i].currentValuePerPosition = thisPositionBoersenData.price;
-          getDepotValuesResult.data[i].currentTotalValue = Number(thisPositionBoersenData.price) * getDepotValuesResult.data[i].count;
-          getDepotValuesResult.data[i].currentGain = getDepotValuesResult.data[i].currentTotalValue - getDepotValuesResult.data[i].totalKaufpreis;
-          getDepotValuesResult.data[i].currentGainPercent = (getDepotValuesResult.data[i].currentTotalValue - getDepotValuesResult.data[i].totalKaufpreis)/getDepotValuesResult.data[i].totalKaufpreis;
-          getDepotValuesResult.data[i].thumbnail = thisPositionBoersenData.thumbnail;
-          totalDepotValue += Number(thisPositionBoersenData.price) * getDepotValuesResult.data[i].count;
-
-          totalDepotBuyPrices += getDepotValuesResult.data[i].totalKaufpreis;
-        }
+        var getAllSharesServiceResult = await this.appService.getAllSharesService();
         
-        resolve({success: true, message: "Depot values obtained", data: { balance: totalDepotValue, positions: getDepotValuesResult.data } });
+        if(getAllSharesServiceResult.success){
+          var totalDepotValue = 0;
+          var totalDepotBuyPrices = 0;
+  
+          for(var i = 0; i<getDepotValuesResult.data.length; i++){
+            
+            var thisPositionBoersenData = getAllSharesServiceResult.data.find(x => x.id === getDepotValuesResult.data[i].ISIN);
+            getDepotValuesResult.data[i].name = thisPositionBoersenData.name;
+            getDepotValuesResult.data[i].currentValuePerPosition = thisPositionBoersenData.price;
+            getDepotValuesResult.data[i].currentTotalValue = Number(thisPositionBoersenData.price) * getDepotValuesResult.data[i].count;
+            getDepotValuesResult.data[i].currentGain = getDepotValuesResult.data[i].currentTotalValue - getDepotValuesResult.data[i].totalKaufpreis;
+            getDepotValuesResult.data[i].currentGainPercent = (getDepotValuesResult.data[i].currentTotalValue - getDepotValuesResult.data[i].totalKaufpreis)/getDepotValuesResult.data[i].totalKaufpreis;
+            getDepotValuesResult.data[i].thumbnail = thisPositionBoersenData.thumbnail;
+            totalDepotValue += Number(thisPositionBoersenData.price) * getDepotValuesResult.data[i].count;
+  
+            totalDepotBuyPrices += getDepotValuesResult.data[i].totalKaufpreis;
+          }
+          
+          resolve({success: true, message: "Depot values obtained", data: { balance: totalDepotValue, positions: getDepotValuesResult.data } });  
+        }else{
+          resolve(getAllSharesServiceResult);
+        }
 
       } else {
         resolve(loginWithPasswordHashResult);
       }
     }.bind(this));
   }
+
+  @Get("/buyOrder")
+  async buyOrderHandler(@Query() buyOrderQueryProperties: buyOrderQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(buyOrderQueryProperties.email, buyOrderQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+  
+
+
+
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+
+
+
 }
+
+
+
