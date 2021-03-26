@@ -198,7 +198,6 @@ export class AppController {
 
         var getDepotValuesResult = await this.appService.getAllOwnedWertpapiereFromDatabase(loginWithPasswordHashResult.additionalInfo.NutzerID, getDepotValuesQueryProperties.depotID);
         
-        // TODO: Loop over positions and load value from Boerse
         var getAllSharesServiceResult = await this.appService.getAllSharesService();
         
         if(getAllSharesServiceResult.success){
