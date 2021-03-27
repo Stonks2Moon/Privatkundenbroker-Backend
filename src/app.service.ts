@@ -145,7 +145,7 @@ export class AppService {
   getNutzer(nutzerID: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("SELECT Nutzer.NutzerID, Vorname, Nachname, Email, Passwort, Strasse, Hausnummer, Postleitzahl, Ort FROM Nutzer JOIN Adresse ON Nutzer.NutzerID = Adresse.NutzerID WHERE Nutzer.NutzerID = ?", [nutzerID], async function (error, results, fields) {
+      connection.query("SELECT Nutzer.NutzerID, Vorname, Nachname, Email, Passwort, Strasse, Hausnummer, Postleitzahl, Ort, IBAN as VerrechnungskontoIBAN FROM Nutzer JOIN Adresse ON Nutzer.NutzerID = Adresse.NutzerID JOIN Verrechnungskonto ON Nutzer.NutzerID = Verrechnungskonto.NutzerID WHERE Nutzer.NutzerID = ?", [nutzerID], async function (error, results, fields) {
         if (error) {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
