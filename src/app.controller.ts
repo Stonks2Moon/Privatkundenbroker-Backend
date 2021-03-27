@@ -249,7 +249,7 @@ export class AppController {
                   var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID);
                   if(checkIfEnoughMoneyOnAccountResult.success){
                     //Execute the transaction on the database
-                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
+                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + "Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
                  
                     if(executeBuyOrderOnDatabaseResult.success){
                       //Place the order
@@ -272,7 +272,7 @@ export class AppController {
                   var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, loginWithPasswordHashResult.additionalInfo.NutzerID);
                   if(checkIfEnoughMoneyOnAccountResult.success){
 
-                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
+                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + "Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
                     if(executeBuyOrderOnDatabaseResult.success){
 
                       var buyLimitOrderResult = await this.appService.buyLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit);
