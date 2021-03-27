@@ -255,13 +255,17 @@ export class AppService {
 
       var timestampOfLastNight = this._getTimestampOfLastNight();
 
-      for (var i = 0; i < allShares.length; i++) {
-        var priceOfLastNight = await this.getPriceOfLastValueBeforeTimestamp(allShares[i].id, timestampOfLastNight);
-        if(priceOfLastNight !== undefined){
-          allShares[i].priceOfLastNight = priceOfLastNight.price;
-        } else {
-          allShares[i].priceOfLastNight = allShares[i].price;
+      if(allShares !== undefined) {
+        for (var i = 0; i < allShares.length; i++) {
+          var priceOfLastNight = await this.getPriceOfLastValueBeforeTimestamp(allShares[i].id, timestampOfLastNight);
+          if(priceOfLastNight !== undefined){
+            allShares[i].priceOfLastNight = priceOfLastNight.price;
+          } else {
+            allShares[i].priceOfLastNight = allShares[i].price;
+          }
         }
+      } else {
+        allShares = [];
       }
 
       resolve({ success: true, message: "All shares successfully retrieved", data: allShares });
