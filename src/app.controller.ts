@@ -234,33 +234,73 @@ export class AppController {
     return new Promise<string>(async function (resolve, reject) {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(buyOrderQueryProperties.email, buyOrderQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
-        
-        switch(buyOrderQueryProperties.type) { 
-          case "Market": { 
-            var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
-            resolve(buyMarketOrderResult);
-            break; 
-          } 
-          case "Stop Market": { 
-            var buyStopMarketOrderResult = await this.appService.buyStopMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.stop);
-            resolve(buyStopMarketOrderResult);
-            break; 
-          } 
-          case "Limit": { 
-            var buyLimitOrderResult = await this.appService.buyLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit);
-            resolve(buyLimitOrderResult);
-            break; 
-          } 
-          case "Stop Limit": { 
-            var buyStopLimitOrderResult = await this.appService.buyStopLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, buyOrderQueryProperties.stop);
-            resolve(buyStopLimitOrderResult);
-            break; 
-          } 
-          default: { 
-            resolve({success: false, message: "Please specify the type of buy order you'd like to place"});
-            break; 
-          } 
-       } 
+        //Check if market is open
+        var marketIsOpenResult = await this.appService.checkIfMarketIsOpen();
+        if(marketIsOpenResult.success){
+          //Check if the amount is under the maximum allowed amount
+          var checkAmountResult = await this.appService.checkAmount(buyOrderQueryProperties.amount);
+          if(checkAmountResult.success){
+
+            var getPriceOfShareServiceResult = await this.appService.getPriceOfShareService(buyOrderQueryProperties.shareID);
+   
+              switch(buyOrderQueryProperties.type) { 
+                case "Market": {
+                  //Check if there is enough money on the account to execute the transaction 
+                  var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID);
+                  if(checkIfEnoughMoneyOnAccountResult.success){
+                    //Execute the transaction on the database
+                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
+                 
+                    if(executeBuyOrderOnDatabaseResult.success){
+                      //Place the order
+                      var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
+                      resolve(buyMarketOrderResult);
+                    }else{
+                      resolve(executeBuyOrderOnDatabaseResult);
+                    } 
+                  }else {
+                    resolve(checkIfEnoughMoneyOnAccountResult);
+                  }
+                  break; 
+                } 
+                case "Stop Market": { 
+                  var buyStopMarketOrderResult = await this.appService.buyStopMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.stop);
+                  resolve(buyStopMarketOrderResult);
+                  break; 
+                } 
+                case "Limit": { 
+                  var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, loginWithPasswordHashResult.additionalInfo.NutzerID);
+                  if(checkIfEnoughMoneyOnAccountResult.success){
+
+                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
+                    if(executeBuyOrderOnDatabaseResult.success){
+
+                      var buyLimitOrderResult = await this.appService.buyLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit);
+                      resolve(buyLimitOrderResult);
+                    }else{
+                      resolve(executeBuyOrderOnDatabaseResult);
+                    } 
+                  }else{
+                    resolve(checkIfEnoughMoneyOnAccountResult);
+                  }                
+                  break; 
+                } 
+                case "Stop Limit": { 
+                  var buyStopLimitOrderResult = await this.appService.buyStopLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, buyOrderQueryProperties.stop);
+                  resolve(buyStopLimitOrderResult);
+                  break; 
+                } 
+                default: { 
+                  resolve({success: false, message: "Please specify the type of buy order you'd like to place"});
+                  break; 
+                } 
+              }
+          }else{
+            resolve(checkAmountResult);
+          }
+        }else {
+          resolve(marketIsOpenResult);
+        }
       } else {
         resolve(loginWithPasswordHashResult);
       }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { callResult } from './interfaces/interfaces';
 import { ShareManager, BörsenAPI, OrderManager, MarketManager } from "moonstonks-boersenapi";
+import { bindCallback } from 'rxjs';
 
 var passwordHash = require('password-hash');
 var mysql = require('mysql');
@@ -353,6 +354,30 @@ export class AppService {
     }.bind(this));
   }
 
+  checkAmount(amount:number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      if(Number(amount) <= config.maxOrderAmount){
+        resolve({ success: true, message: "The amount is under the maximum allowed amount"})
+      } else{
+        resolve({ success: false, message: "The specified amount exceeds the maximum allowed amount", additionalInfo: {MaxAmount: config.maxOrderAmount}})
+      }
+    }.bind(this))
+  }
+
+  checkIfEnoughMoneyOnAccount(amount:number, price:number, nutzerID:number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      var totalTransactionValue = Number(amount) * Number(price);
+      var getBalanceOfVerrechnungskontoResult = await this.getBalanceOfVerrechnungskonto(nutzerID);
+
+      if(totalTransactionValue <= getBalanceOfVerrechnungskontoResult.data.Guthaben){
+        resolve({ success: true, message: "Enough money on the account", additionalInfo: {totalTransactionValue: totalTransactionValue}})
+      }else{
+        resolve({ success: false, message: "There is not enough money on the account", additionalInfo: {totalTransactionValue: totalTransactionValue, AccountMoney: getBalanceOfVerrechnungskontoResult.data.Guthaben}})
+      }
+    }.bind(this))
+  }
+
   checkIfMarketIsOpen() {
     return new Promise<callResult>(async function (resolve, reject) {
       await MarketManager.isOpen()
@@ -382,6 +407,35 @@ export class AppService {
             depotIDs.push(results[i].DepotID)
           }
           resolve(depotIDs);
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  executeBuyOrderOnDatabase(amount:number, shareID:string, depotID:number, price: number, nutzerID:number, description:string, totalTransactionValue:number, receipient:string) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      for(var i = 0; i < amount; i++){
+        var addShareToDepotResult = await this._addShareToDepot(shareID, depotID, price);
+        if(!addShareToDepotResult.success){
+          resolve(addShareToDepotResult)
+        }
+      }
+      var createTransactionResult = await this.createTransactionAsAdmin(nutzerID, description, -totalTransactionValue, receipient)
+      resolve(createTransactionResult)
+
+    }.bind(this))
+  }
+
+  _addShareToDepot(shareID:string, depotID:number, price: number) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("Insert INTO Wertpapier  (`WertpapierID`, `ISIN`, `DepotID`, `Kaufpreis`)  VALUES (NULL, ?, ?, ?)", [shareID, depotID, price], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Share has been added to depot", additionalInfo: {ShareID: shareID, DepotID: depotID, Price: price} });
         }
       });
       connection.end();
