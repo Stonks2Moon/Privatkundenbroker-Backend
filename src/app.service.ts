@@ -496,8 +496,8 @@ export class AppService {
 
         var getOrderByBoerseOrderRefIDResult = await this._getOrderByBoerseOrderRefID(body.orderId);
         console.log(getOrderByBoerseOrderRefIDResult);
-
-        var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.Anzahl, getOrderByBoerseOrderRefIDResult.ShareRefID, getOrderByBoerseOrderRefIDResult.DepotID, getOrderByBoerseOrderRefIDResult.Ausfuehrungspreis);
+        console.log(getOrderByBoerseOrderRefIDResult.data.Anzahl);
+        var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
         console.log(addSharesToDepotResult);
 
         resolve({ success: true, message: "Success" });
