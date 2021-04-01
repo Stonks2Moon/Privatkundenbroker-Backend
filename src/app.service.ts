@@ -58,7 +58,7 @@ export class AppService {
         } else {
           if (results.length === 1) {
             var depotIDsOfUser = await this._getDepotIDsOfUser(results[0].NutzerID);
-            
+
             resolve({ success: true, message: "Login successful", additionalInfo: { NutzerID: results[0].NutzerID, Vorname: results[0].Vorname, Nachname: results[0].Nachname, Email: results[0].Email, hashedPassword: hashedPassword, depotIDs: depotIDsOfUser } });
           } else {
             resolve({ success: false, message: "Login failed. Wrong email or password-hash!" });
@@ -259,10 +259,10 @@ export class AppService {
 
       var timestampOfLastNight = this._getTimestampOfLastNight();
 
-      if(allShares !== undefined) {
+      if (allShares !== undefined) {
         for (var i = 0; i < allShares.length; i++) {
           var priceOfLastNight = await this.getPriceOfLastValueBeforeTimestamp(allShares[i].id, timestampOfLastNight);
-          if(priceOfLastNight !== undefined){
+          if (priceOfLastNight !== undefined) {
             allShares[i].priceOfLastNight = priceOfLastNight.price;
           } else {
             allShares[i].priceOfLastNight = allShares[i].price;
@@ -283,21 +283,22 @@ export class AppService {
 
       var pricesList = await ShareManager.getPrices(shareID, {
         from: timestampOfNightSevenDaysBeforeTimestamp,
-        until: timestamp });
-      resolve(pricesList[pricesList.length-1]);
+        until: timestamp
+      });
+      resolve(pricesList[pricesList.length - 1]);
     }.bind(this));
   }
 
   getShare(shareID: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var allShares = await this.getAllSharesService();
-      
-      if(allShares.success = true){
+
+      if (allShares.success = true) {
         var share = allShares.data.find(x => x.id === shareID)
-        if(share !== undefined){
-          resolve({success: true, message: "Share has been obtained", data: share});
+        if (share !== undefined) {
+          resolve({ success: true, message: "Share has been obtained", data: share });
         } else {
-          resolve({success: false, message: "Share not found" });
+          resolve({ success: false, message: "Share not found" });
         }
       } else {
         resolve(allShares);
@@ -318,8 +319,8 @@ export class AppService {
   getPriceDevelopmentOfShareService(shareID: string, from: number, until: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       await ShareManager.getPrices(shareID, {
-       from: Number(from),
-       until: Number(until)
+        from: Number(from),
+        until: Number(until)
       })
         .then((res) => resolve({ success: true, message: "Price development for share successfully retrieved", data: res }))
         .catch((err) => resolve({ success: false, message: "Failed to retrieve the price development of the share", additionalInfo: err }));
@@ -398,44 +399,44 @@ export class AppService {
     }.bind(this));
   }
 
-  checkAmount(amount:number) {
+  checkAmount(amount: number) {
     return new Promise<callResult>(async function (resolve, reject) {
-      if(Number(amount) <= config.maxOrderAmount){
-        resolve({ success: true, message: "The amount is under the maximum allowed amount"})
-      } else{
-        resolve({ success: false, message: "The specified amount exceeds the maximum allowed amount", additionalInfo: {MaxAmount: config.maxOrderAmount}})
+      if (Number(amount) <= config.maxOrderAmount) {
+        resolve({ success: true, message: "The amount is under the maximum allowed amount" })
+      } else {
+        resolve({ success: false, message: "The specified amount exceeds the maximum allowed amount", additionalInfo: { MaxAmount: config.maxOrderAmount } })
       }
     }.bind(this))
   }
 
-  checkIfEnoughMoneyOnAccount(amount:number, price:number, nutzerID:number) {
+  checkIfEnoughMoneyOnAccount(amount: number, price: number, nutzerID: number) {
     return new Promise<callResult>(async function (resolve, reject) {
 
       var totalTransactionValue = Number(amount) * Number(price);
       var getBalanceOfVerrechnungskontoResult = await this.getBalanceOfVerrechnungskonto(nutzerID);
 
-      if(totalTransactionValue <= getBalanceOfVerrechnungskontoResult.data.Guthaben){
-        resolve({ success: true, message: "Enough money on the account", additionalInfo: {totalTransactionValue: totalTransactionValue}})
-      }else{
-        resolve({ success: false, message: "There is not enough money on the account", additionalInfo: {totalTransactionValue: totalTransactionValue, AccountMoney: getBalanceOfVerrechnungskontoResult.data.Guthaben}})
+      if (totalTransactionValue <= getBalanceOfVerrechnungskontoResult.data.Guthaben) {
+        resolve({ success: true, message: "Enough money on the account", additionalInfo: { totalTransactionValue: totalTransactionValue } })
+      } else {
+        resolve({ success: false, message: "There is not enough money on the account", additionalInfo: { totalTransactionValue: totalTransactionValue, AccountMoney: getBalanceOfVerrechnungskontoResult.data.Guthaben } })
       }
     }.bind(this))
   }
 
-  checkIfDepotHasEnoughShares(amount:number, shareID:string, nutzerID: number, depotID: number) {
+  checkIfDepotHasEnoughShares(amount: number, shareID: string, nutzerID: number, depotID: number) {
     return new Promise<callResult>(async function (resolve, reject) {
-      
+
       var allOwnedSharesResult: callResult = await this.getAllOwnedWertpapiereFromDatabase(nutzerID, depotID);
 
-      if(allOwnedSharesResult.success){
+      if (allOwnedSharesResult.success) {
         var depotShare = allOwnedSharesResult.data.find(x => x.ISIN === shareID);
 
-        if( amount <= depotShare.count){
-          resolve({success: true, message: "Enough shares in the depot", additionalInfo: { ShareID: shareID, Amount: amount } });  
-        }else{
-          resolve({success: false, message: "Not enough shares in the depot", additionalInfo: { SharedID: shareID, DepotAmount: depotShare.count, SellAmount: amount } });  
+        if (amount <= depotShare.count) {
+          resolve({ success: true, message: "Enough shares in the depot", additionalInfo: { ShareID: shareID, Amount: amount } });
+        } else {
+          resolve({ success: false, message: "Not enough shares in the depot", additionalInfo: { SharedID: shareID, DepotAmount: depotShare.count, SellAmount: amount } });
         }
-      }else {
+      } else {
         resolve(allOwnedSharesResult);
       }
 
@@ -451,7 +452,7 @@ export class AppService {
   }
 
   validateWebhookAuthToken(webhookAuthToken: string) {
-    if(webhookAuthToken == config.webhookAuthenticationToken) {
+    if (webhookAuthToken == config.webhookAuthenticationToken) {
       return true;
     } else {
       return false;
@@ -460,40 +461,53 @@ export class AppService {
 
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log("Request at webhook (onPlace) received");
-      var updateBoerseOrderRefIDResult = await this._updateBoerseOrderRefID(body.id, body.jobId);
-      console.log(updateBoerseOrderRefIDResult);
-      resolve({success: true, message: "Success"});
+      setTimeout(async function () {
+        alert("Hello");
+        console.log("Request at webhook (onPlace) received");
+        var updateBoerseOrderRefIDResult = await this._updateBoerseOrderRefID(body.id, body.jobId);
+        console.log(updateBoerseOrderRefIDResult);
+        resolve({ success: true, message: "Success" });
+      }.bind(this), 2000);
+
     }.bind(this));
   }
 
   webhookOnMatch(body) {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log("Request at webhook (onMatch) received");
-      var updateOrderStatusResult = await this._updateOrderStatusID(2, body.orderId);
-      console.log(updateOrderStatusResult);
-      resolve({success: true, message: "Success"});
+      setTimeout(async function () {
+        console.log("Request at webhook (onMatch) received");
+        var updateOrderStatusResult = await this._updateOrderStatusID(2, body.orderId);
+        console.log(updateOrderStatusResult);
+        resolve({ success: true, message: "Success" });
+      }.bind(this), 3000);
     }.bind(this));
   }
 
   webhookOnComplete(body) {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log("Request at webhook (onComplete) received");
-      var updateOrderStatusResult = await this._updateOrderStatusID(3, body.orderId);
-      console.log(updateOrderStatusResult);
+      setTimeout(async function () {
+        console.log("Request at webhook (onComplete) received");
+        var updateOrderStatusResult = await this._updateOrderStatusID(3, body.orderId);
+        console.log(updateOrderStatusResult);
 
-      // TODO: Wertpapiere anlegen, Transaktionskorrektur
+        // TODO: Wertpapiere anlegen, Transaktionskorrektur
 
-      resolve({success: true, message: "Success"});
+        resolve({ success: true, message: "Success" });
+      }.bind(this), 4000);
+
     }.bind(this));
   }
 
   webhookOnDelete(body) {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log("Request at webhook (onDelete) received");
-      var updateOrderStatusResult = await this._updateOrderStatusID(4, body.orderId);
-      console.log(updateOrderStatusResult);
-      resolve({success: true, message: "Success"});
+      setTimeout(async function () {
+
+        console.log("Request at webhook (onDelete) received");
+        var updateOrderStatusResult = await this._updateOrderStatusID(4, body.orderId);
+        console.log(updateOrderStatusResult);
+        resolve({ success: true, message: "Success" });
+      }.bind(this), 5000);
+
     }.bind(this));
   }
 
@@ -514,7 +528,7 @@ export class AppService {
           resolve([]);
         } else {
           var depotIDs = [];
-          for(var i = 0; i < results.length; i++) {
+          for (var i = 0; i < results.length; i++) {
             depotIDs.push(results[i].DepotID)
           }
           resolve(depotIDs);
@@ -524,7 +538,7 @@ export class AppService {
     }.bind(this));
   }
 
-  createOrderInDatabase(depotID:number, transactionID:number, boerseJobRefID:number, orderStatusID: number, shareRefID:string, orderTypID:number, amount:number) {
+  createOrderInDatabase(depotID: number, transactionID: number, boerseJobRefID: number, orderStatusID: number, shareRefID: string, orderTypID: number, amount: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
       connection.query("INSERT INTO `Order` (`OrderID`, `DepotID`, `TransaktionsID`, `BoerseJobRefID`, `OrderstatusID`, `ShareRefID`, `OrdertypID`, `Anzahl`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ? )", [depotID, transactionID, boerseJobRefID, orderStatusID, shareRefID, orderTypID, amount], function (error, results, fields) {
@@ -532,14 +546,14 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Orders has been created", additionalInfo: {DepotID: depotID, TransactionID: transactionID, BoerseOrderRefID: boerseJobRefID, OrderStatusID: orderStatusID, ShareRefID: shareRefID, OrderTypID: orderTypID, Amount: amount} });
+          resolve({ success: true, message: "Orders has been created", additionalInfo: { DepotID: depotID, TransactionID: transactionID, BoerseOrderRefID: boerseJobRefID, OrderStatusID: orderStatusID, ShareRefID: shareRefID, OrderTypID: orderTypID, Amount: amount } });
         }
       });
       connection.end();
     }.bind(this))
   }
 
-  _updateBoerseOrderRefID(boerseOrderRefID:string, boerseJobRefID:number) {
+  _updateBoerseOrderRefID(boerseOrderRefID: string, boerseJobRefID: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
       connection.query("UPDATE `Order` SET `BoerseOrderRefID` = ? WHERE `Order`.`BoerseJobRefID` = ?", [boerseOrderRefID, boerseJobRefID], function (error, results, fields) {
@@ -547,14 +561,14 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "BoerseOrderRefID has been updated", additionalInfo: {BoerseOrderRefID: boerseOrderRefID, BoerseJobRefID: boerseJobRefID} });
+          resolve({ success: true, message: "BoerseOrderRefID has been updated", additionalInfo: { BoerseOrderRefID: boerseOrderRefID, BoerseJobRefID: boerseJobRefID } });
         }
       });
       connection.end();
     }.bind(this))
   }
 
-  _updateOrderStatusID(orderStatusID:number, boerseOrderRefID:number,) {
+  _updateOrderStatusID(orderStatusID: number, boerseOrderRefID: number,) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
       connection.query("UPDATE `Order` SET `OrderStatusID` = ? WHERE `Order`.`BoerseOrderRefID` = ?", [orderStatusID, boerseOrderRefID], function (error, results, fields) {
@@ -562,18 +576,18 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "OrderStatusID has been updated", additionalInfo: {OrderStatusID: orderStatusID, BoerseOrderRefID: boerseOrderRefID} });
+          resolve({ success: true, message: "OrderStatusID has been updated", additionalInfo: { OrderStatusID: orderStatusID, BoerseOrderRefID: boerseOrderRefID } });
         }
       });
       connection.end();
     }.bind(this))
   }
 
-  addSharesToDepot(amount:number, shareID:string, depotID:number, price: number) {
+  addSharesToDepot(amount: number, shareID: string, depotID: number, price: number) {
     return new Promise<callResult>(async function (resolve, reject) {
-      for(var i = 0; i < amount; i++){
+      for (var i = 0; i < amount; i++) {
         var addOneShareToDepotResult = await this._addOneShareToDepot(shareID, depotID, price);
-        if(!addOneShareToDepotResult.success){
+        if (!addOneShareToDepotResult.success) {
           resolve(addOneShareToDepotResult)
         }
       }
@@ -581,7 +595,7 @@ export class AppService {
     }.bind(this))
   }
 
-  _addOneShareToDepot(shareID:string, depotID:number, price: number) {
+  _addOneShareToDepot(shareID: string, depotID: number, price: number) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
       connection.query("Insert INTO Wertpapier  (`WertpapierID`, `ISIN`, `DepotID`, `Kaufpreis`)  VALUES (NULL, ?, ?, ?)", [shareID, depotID, price], function (error, results, fields) {
@@ -589,7 +603,7 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Share has been added to depot", additionalInfo: {ShareID: shareID, DepotID: depotID, Price: price} });
+          resolve({ success: true, message: "Share has been added to depot", additionalInfo: { ShareID: shareID, DepotID: depotID, Price: price } });
         }
       });
       connection.end();
