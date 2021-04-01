@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { callResult } from './interfaces/interfaces';
 import { ShareManager, BörsenAPI, OrderManager, MarketManager } from "moonstonks-boersenapi";
-import { bindCallback } from 'rxjs';
 
 var passwordHash = require('password-hash');
 var mysql = require('mysql');
 const config = require('../config.json')
 
+const onPlaceURL = "https://privat.moonstonks.space//webhook/onPlace?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onMatchURL = "https://privat.moonstonks.space//webhook/onMatch?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onCompleteURL = "https://privat.moonstonks.space//webhook/onComplete?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onDeleteURL = "https://privat.moonstonks.space//webhook/onDelete?webhookAuthToken=" + config.webhookAuthenticationToken;
+
 const api = new BörsenAPI(config.MoonAuthenticationToken);
-const orderManager: OrderManager = new OrderManager(api, 'onPlace', 'onMatch', 'onComplete', 'onDelete')
+const orderManager: OrderManager = new OrderManager(api, onPlaceURL, onMatchURL, onCompleteURL, onDeleteURL);
 
 @Injectable()
 export class AppService {
