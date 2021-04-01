@@ -3,7 +3,7 @@ import { AppService } from './app.service';
 import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties,
-  getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
+  getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
   webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties } from './app.apiproperties';
 
 @Controller()
@@ -265,15 +265,29 @@ export class AppController {
                   break; 
                 } 
                 case "Stop Market": { 
-                  var buyStopMarketOrderResult = await this.appService.buyStopMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.stop);
-                  resolve(buyStopMarketOrderResult);
+                  //Check if there is enough money on the account to execute the transaction 
+                  var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID);
+                  if(checkIfEnoughMoneyOnAccountResult.success){
+                    //Execute the transaction on the database
+                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
+                 
+                    if(executeBuyOrderOnDatabaseResult.success){
+                      //Place the order
+                      var buyStopMarketOrderResult = await this.appService.buyStopMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.stop);
+                      resolve(buyStopMarketOrderResult);
+                    }else{
+                      resolve(executeBuyOrderOnDatabaseResult);
+                    } 
+                  }else {
+                    resolve(checkIfEnoughMoneyOnAccountResult);
+                  }
                   break; 
                 } 
                 case "Limit": { 
                   var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, loginWithPasswordHashResult.additionalInfo.NutzerID);
                   if(checkIfEnoughMoneyOnAccountResult.success){
 
-                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
+                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, buyOrderQueryProperties.limit, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
                     if(executeBuyOrderOnDatabaseResult.success){
 
                       var buyLimitOrderResult = await this.appService.buyLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit);
@@ -287,8 +301,22 @@ export class AppController {
                   break; 
                 } 
                 case "Stop Limit": { 
-                  var buyStopLimitOrderResult = await this.appService.buyStopLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, buyOrderQueryProperties.stop);
-                  resolve(buyStopLimitOrderResult);
+                  //Check if there is enough money on the account to execute the transaction 
+                  var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID);
+                  if(checkIfEnoughMoneyOnAccountResult.success){
+                    //Execute the transaction on the database
+                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
+                 
+                    if(executeBuyOrderOnDatabaseResult.success){
+                      //Place the Order
+                      var buyStopLimitOrderResult = await this.appService.buyStopLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, buyOrderQueryProperties.stop);
+                      resolve(buyStopLimitOrderResult);
+                    }else{
+                      resolve(executeBuyOrderOnDatabaseResult);
+                    } 
+                  }else {
+                    resolve(checkIfEnoughMoneyOnAccountResult);
+                  }
                   break; 
                 } 
                 default: { 
@@ -296,6 +324,66 @@ export class AppController {
                   break; 
                 } 
               }
+          }else{
+            resolve(checkAmountResult);
+          }
+        }else {
+          resolve(marketIsOpenResult);
+        }
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+
+  @Post("/sellOrder")
+  async sellOrderHandler(@Query() sellOrderQueryProperties: sellOrderQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(sellOrderQueryProperties.email, sellOrderQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+        //Check if market is open
+        var marketIsOpenResult = await this.appService.checkIfMarketIsOpen();
+        if(marketIsOpenResult.success){
+          //Check if the amount is under the maximum allowed amount
+          var checkAmountResult = await this.appService.checkAmount(sellOrderQueryProperties.amount);
+          if(checkAmountResult.success){
+              //Check if enough shares are in the depot
+            var checkIfDepotHasEnoughSharesResult = await this.appService.checkIfDepotHasEnoughShares(sellOrderQueryProperties.amount, sellOrderQueryProperties.shareID, loginWithPasswordHashResult.additionalInfo.NutzerID, sellOrderQueryProperties.depotID);
+           
+            if(checkIfDepotHasEnoughSharesResult.success){
+              switch(sellOrderQueryProperties.type) { 
+                case "Market": {
+                  //Place the order
+                  var sellMarketOrderResult = await this.appService.sellMarketOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount);
+                   resolve(sellMarketOrderResult);
+                  break; 
+                } 
+                case "Stop Market": { 
+                  //Place the order
+                  var sellStopMarketOrderResult = await this.appService.sellStopMarketOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, sellOrderQueryProperties.stop);
+                  resolve(sellStopMarketOrderResult);
+                  break; 
+                } 
+                case "Limit": { 
+                  //Place the order
+                  var sellLimitOrderResult = await this.appService.sellLimitOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, sellOrderQueryProperties.limit);
+                  resolve(sellLimitOrderResult);            
+                  break; 
+                } 
+                case "Stop Limit": { 
+                  //Place the order
+                  var sellStopLimitOrderResult = await this.appService.sellStopLimitOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, sellOrderQueryProperties.limit, sellOrderQueryProperties.limit);
+                  resolve(sellStopLimitOrderResult);   
+                  break; 
+                } 
+                default: { 
+                  resolve({success: false, message: "Please specify the type of sell order you'd like to place"});
+                  break; 
+                } 
+              }
+            }else{
+              resolve(checkIfDepotHasEnoughSharesResult);
+            }
           }else{
             resolve(checkAmountResult);
           }
