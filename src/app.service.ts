@@ -560,7 +560,7 @@ export class AppService {
   _updateAusfuehrungspreisInDatabase(boerseOrderRefID: string, ausfuehrungspreis: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("UPDATE `Order` SET `Aufruehrungspreis` = '?' WHERE `Order`.`boerseOrderRefID` = ?;", [ausfuehrungspreis, boerseOrderRefID], function (error, results, fields) {
+      connection.query("UPDATE `Order` SET `Ausfuehrungspreis` = '?' WHERE `Order`.`boerseOrderRefID` = ?;", [ausfuehrungspreis, boerseOrderRefID], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
