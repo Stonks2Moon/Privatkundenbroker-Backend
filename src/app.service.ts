@@ -494,10 +494,10 @@ export class AppService {
 
         // TODO: Wertpapiere anlegen, Transaktionskorrektur
 
-        var getOrderByBoerseOrderRefIDResult = this._getOrderByBoerseOrderRefID(body.orderId);
+        var getOrderByBoerseOrderRefIDResult = await this._getOrderByBoerseOrderRefID(body.orderId);
         console.log(getOrderByBoerseOrderRefIDResult);
 
-        var addSharesToDepotResult = this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.Anzahl, getOrderByBoerseOrderRefIDResult.ShareRefID, getOrderByBoerseOrderRefIDResult.DepotID, getOrderByBoerseOrderRefIDResult.Ausfuehrungspreis);
+        var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.Anzahl, getOrderByBoerseOrderRefIDResult.ShareRefID, getOrderByBoerseOrderRefIDResult.DepotID, getOrderByBoerseOrderRefIDResult.Ausfuehrungspreis);
         console.log(addSharesToDepotResult);
 
         resolve({ success: true, message: "Success" });
