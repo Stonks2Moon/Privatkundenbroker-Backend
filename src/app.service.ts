@@ -460,7 +460,7 @@ export class AppService {
 
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log("!");
+      console.log("Request at webhook (onPlace) received");
       var updateBoerseOrderRefIDResult = await this._updateBoerseOrderRefID(body.id, body.jobId);
       console.log(updateBoerseOrderRefIDResult);
       resolve({success: true, message: "Success"});
@@ -469,18 +469,30 @@ export class AppService {
 
   webhookOnMatch(body) {
     return new Promise<callResult>(async function (resolve, reject) {
+      console.log("Request at webhook (onMatch) received");
+      var updateOrderStatusResult = await this._updateOrderStatusID(2, body.orderId);
+      console.log(updateOrderStatusResult);
       resolve({success: true, message: "Success"});
     });
   }
 
   webhookOnComplete(body) {
     return new Promise<callResult>(async function (resolve, reject) {
+      console.log("Request at webhook (onComplete) received");
+      var updateOrderStatusResult = await this._updateOrderStatusID(3, body.orderId);
+      console.log(updateOrderStatusResult);
+
+      // TODO: Wertpapiere anlegen, Transaktionskorrektur
+
       resolve({success: true, message: "Success"});
     });
   }
 
   webhookOnDelete(body) {
     return new Promise<callResult>(async function (resolve, reject) {
+      console.log("Request at webhook (onDelete) received");
+      var updateOrderStatusResult = await this._updateOrderStatusID(4, body.orderId);
+      console.log(updateOrderStatusResult);
       resolve({success: true, message: "Success"});
     });
   }
@@ -542,15 +554,15 @@ export class AppService {
     }.bind(this))
   }
 
-  _updateOrderStatusID(orderStatusID:number, boerseJobRefID:number,) {
+  _updateOrderStatusID(orderStatusID:number, boerseOrderRefID:number,) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("UPDATE `Order` SET `OrderStatusID` = ? WHERE `Order`.`BoerseJobRefID` = ?", [orderStatusID, boerseJobRefID], function (error, results, fields) {
+      connection.query("UPDATE `Order` SET `OrderStatusID` = ? WHERE `Order`.`BoerseOrderRefID` = ?", [orderStatusID, boerseOrderRefID], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "OrderStatusID has been updated", additionalInfo: {OrderStatusID: orderStatusID, BoerseJobRefID: boerseJobRefID} });
+          resolve({ success: true, message: "OrderStatusID has been updated", additionalInfo: {OrderStatusID: orderStatusID, BoerseOrderRefID: boerseOrderRefID} });
         }
       });
       connection.end();
