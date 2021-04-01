@@ -228,7 +228,7 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Transaction has been created" });
+          resolve({ success: true, message: "Transaction has been created", additionalInfo: results });
         }
       });
       connection.end();
@@ -509,21 +509,34 @@ export class AppService {
     }.bind(this));
   }
 
-  executeBuyOrderOnDatabase(amount:number, shareID:string, depotID:number, price: number, nutzerID:number, description:string, totalTransactionValue:number, receipient:string) {
+  createOrderInDatabase(depotID:number, transactionID:number, boerseOrderRefID:number, orderStatusID: number, shareRefID:string, orderTypID:number, amount:number) {
     return new Promise<callResult>(async function (resolve, reject) {
-      for(var i = 0; i < amount; i++){
-        var addShareToDepotResult = await this._addShareToDepot(shareID, depotID, price);
-        if(!addShareToDepotResult.success){
-          resolve(addShareToDepotResult)
+      var connection = mysql.createConnection(config.database);
+      connection.query("INSERT INTO `Order` (`OrderID`, `DepotID`, `TransaktionsID`, `BoerseOrderRefID`, `OrderstatusID`, `ShareRefID`, `OrdertypID`, `Anzahl`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ? )", [depotID, transactionID, boerseOrderRefID, orderStatusID, shareRefID, orderTypID, amount], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Orders has been created", additionalInfo: {DepotID: depotID, TransactionID: transactionID, BoerseOrderRefID: boerseOrderRefID, OrderStatusID: orderStatusID, ShareRefID: shareRefID, OrderTypID: orderTypID, Amount: amount} });
         }
-      }
-      var createTransactionResult = await this.createTransactionAsAdmin(nutzerID, description, -totalTransactionValue, receipient)
-      resolve(createTransactionResult)
-
+      });
+      connection.end();
     }.bind(this))
   }
 
-  _addShareToDepot(shareID:string, depotID:number, price: number) {
+  addSharesToDepot(amount:number, shareID:string, depotID:number, price: number, nutzerID:number, description:string, totalTransactionValue:number, receipient:string) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      for(var i = 0; i < amount; i++){
+        var addOneShareToDepotResult = await this._addOneShareToDepot(shareID, depotID, price);
+        if(!addOneShareToDepotResult.success){
+          resolve(addOneShareToDepotResult)
+        }
+      }
+      resolve(addOneShareToDepotResult)
+    }.bind(this))
+  }
+
+  _addOneShareToDepot(shareID:string, depotID:number, price: number) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
       connection.query("Insert INTO Wertpapier  (`WertpapierID`, `ISIN`, `DepotID`, `Kaufpreis`)  VALUES (NULL, ?, ?, ?)", [shareID, depotID, price], function (error, results, fields) {
