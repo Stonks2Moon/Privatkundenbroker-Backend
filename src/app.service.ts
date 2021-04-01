@@ -460,7 +460,7 @@ export class AppService {
 
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log("JobID: " + body.jobId);
+      console.log(body);
       resolve({success: true, message: "Success"});
     });
   }
