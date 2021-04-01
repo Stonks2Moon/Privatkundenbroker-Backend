@@ -269,16 +269,25 @@ export class AppController {
                   //Check if there is enough money on the account to execute the transaction 
                   var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID);
                   if(checkIfEnoughMoneyOnAccountResult.success){
-                    //Execute the transaction on the database
-                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, getPriceOfShareServiceResult.data, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
-                 
-                    if(executeBuyOrderOnDatabaseResult.success){
-                      //Place the order
-                      var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
-                      resolve(buyMarketOrderResult);
+                    //Place the order
+                    var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
+                    
+                    if(buyMarketOrderResult.success){
+                      //Execute the transaction on the database
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      
+                      if(createTransactionResult.success){
+                        //Create an order in the database
+                        var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(buyOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, buyMarketOrderResult.data.id, 1, buyOrderQueryProperties.shareID, 2, buyOrderQueryProperties.amount)
+                        resolve(createOrderInDatabaseResult);
+
+                      }else{
+                        resolve(createTransactionResult);
+                      }
+
                     }else{
-                      resolve(executeBuyOrderOnDatabaseResult);
-                    } 
+                      resolve(buyMarketOrderResult);
+                    }
                   }else {
                     resolve(checkIfEnoughMoneyOnAccountResult);
                   }
@@ -288,56 +297,85 @@ export class AppController {
                   //Check if there is enough money on the account to execute the transaction 
                   var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID);
                   if(checkIfEnoughMoneyOnAccountResult.success){
-                    //Execute the transaction on the database
-                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
-                 
-                    if(executeBuyOrderOnDatabaseResult.success){
-                      //Place the order
-                      var buyStopMarketOrderResult = await this.appService.buyStopMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.stop);
-                      resolve(buyStopMarketOrderResult);
+                    //Place the order
+                    var buyStopMarketOrderResult = await this.appService.buyStopMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.stop);
+                    
+                    if(buyStopMarketOrderResult.success){
+                      //Execute the transaction on the database
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      
+                      if(createTransactionResult.success){
+                        //Create an order in the database
+                        var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(buyOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, buyStopMarketOrderResult.data.id, 1, buyOrderQueryProperties.shareID, 2, buyOrderQueryProperties.amount)
+                        resolve(createOrderInDatabaseResult);
+
+                      }else{
+                        resolve(createTransactionResult);
+                      }
+
                     }else{
-                      resolve(executeBuyOrderOnDatabaseResult);
-                    } 
+                      resolve(buyStopMarketOrderResult);
+                    }
                   }else {
                     resolve(checkIfEnoughMoneyOnAccountResult);
                   }
-                  break; 
+                  break;                   
                 } 
                 case "Limit": { 
+                  //Check if there is enough money on the account to execute the transaction 
                   var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, loginWithPasswordHashResult.additionalInfo.NutzerID);
                   if(checkIfEnoughMoneyOnAccountResult.success){
+                    //Place the order
+                    var buyLimitOrderResult = await this.appService.buyLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit);
+                    
+                    if(buyLimitOrderResult.success){
+                      //Execute the transaction on the database
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      
+                      if(createTransactionResult.success){
+                        //Create an order in the database
+                        var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(buyOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, buyLimitOrderResult.data.id, 1, buyOrderQueryProperties.shareID, 2, buyOrderQueryProperties.amount)
+                        resolve(createOrderInDatabaseResult);
 
-                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, buyOrderQueryProperties.limit, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
-                    if(executeBuyOrderOnDatabaseResult.success){
+                      }else{
+                        resolve(createTransactionResult);
+                      }
 
-                      var buyLimitOrderResult = await this.appService.buyLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit);
-                      resolve(buyLimitOrderResult);
                     }else{
-                      resolve(executeBuyOrderOnDatabaseResult);
-                    } 
-                  }else{
+                      resolve(buyLimitOrderResult);
+                    }
+                  }else {
                     resolve(checkIfEnoughMoneyOnAccountResult);
-                  }                
-                  break; 
+                  }
+                  break;                        
                 } 
-                case "Stop Limit": { 
+                case "Stop Limit": {
                   //Check if there is enough money on the account to execute the transaction 
                   var checkIfEnoughMoneyOnAccountResult = await this.appService.checkIfEnoughMoneyOnAccount(buyOrderQueryProperties.amount, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID);
                   if(checkIfEnoughMoneyOnAccountResult.success){
-                    //Execute the transaction on the database
-                    var executeBuyOrderOnDatabaseResult = await this.appService.executeBuyOrderOnDatabase(buyOrderQueryProperties.amount, buyOrderQueryProperties.shareID, buyOrderQueryProperties.depotID, buyOrderQueryProperties.stop, loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID + " Anzahl: " + buyOrderQueryProperties.amount, checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO");
-                 
-                    if(executeBuyOrderOnDatabaseResult.success){
-                      //Place the Order
-                      var buyStopLimitOrderResult = await this.appService.buyStopLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, buyOrderQueryProperties.stop);
-                      resolve(buyStopLimitOrderResult);
+                    //Place the order
+                    var buyStopLimitOrderResult = await this.appService.buyStopLimitOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount, buyOrderQueryProperties.limit, buyOrderQueryProperties.stop);
+                    
+                    if(buyStopLimitOrderResult.success){
+                      //Execute the transaction on the database
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      
+                      if(createTransactionResult.success){
+                        //Create an order in the database
+                        var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(buyOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, buyStopLimitOrderResult.data.id, 1, buyOrderQueryProperties.shareID, 2, buyOrderQueryProperties.amount)
+                        resolve(createOrderInDatabaseResult);
+
+                      }else{
+                        resolve(createTransactionResult);
+                      }
+
                     }else{
-                      resolve(executeBuyOrderOnDatabaseResult);
-                    } 
+                      resolve(buyStopLimitOrderResult);
+                    }
                   }else {
                     resolve(checkIfEnoughMoneyOnAccountResult);
                   }
-                  break; 
+                  break;                     
                 } 
                 default: { 
                   resolve({success: false, message: "Please specify the type of buy order you'd like to place"});
