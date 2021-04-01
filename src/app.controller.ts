@@ -500,7 +500,7 @@ export class AppController {
   async webhookOnComplete(@Query() webhookOnCompleteQueryProperties: webhookOnCompleteQueryProperties, @Body() webhookOnCompleteBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnCompleteQueryProperties.webhookAuthToken)) {
-        var webhookOnCompleteResult = await this.appService.webhookOnComplete();
+        var webhookOnCompleteResult = await this.appService.webhookOnComplete(webhookOnCompleteBodyParameter);
         console.log(webhookOnCompleteBodyParameter);
 
         resolve(JSON.stringify(webhookOnCompleteResult));
