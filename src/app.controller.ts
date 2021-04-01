@@ -271,7 +271,6 @@ export class AppController {
                   if(checkIfEnoughMoneyOnAccountResult.success){
                     //Place the order
                     var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
-                    console.log(buyMarketOrderResult)
                     if(buyMarketOrderResult.success){
                       //Execute the transaction on the database
                       var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
