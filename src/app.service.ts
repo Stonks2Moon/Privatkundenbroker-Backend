@@ -478,6 +478,8 @@ export class AppService {
         console.log(body);
         var updateOrderStatusResult = await this._updateOrderStatusID(2, body.orderId);
         console.log(updateOrderStatusResult);
+        var updateAusfuehrungspreisInDatabaseResult = await this._updateAusfuehrungspreisInDatabase(body.orderId, body.price)
+        console.log(updateAusfuehrungspreisInDatabaseResult)
         resolve({ success: true, message: "Success" });
       }.bind(this), 3000);
     }.bind(this));
@@ -491,6 +493,8 @@ export class AppService {
         console.log(updateOrderStatusResult);
 
         // TODO: Wertpapiere anlegen, Transaktionskorrektur
+        //var addSharesToDepotResult = await this._addSharesToDepot()
+
 
         resolve({ success: true, message: "Success" });
       }.bind(this), 4000);
@@ -553,6 +557,21 @@ export class AppService {
     }.bind(this))
   }
 
+  _updateAusfuehrungspreisInDatabase(boerseOrderRefID: string, ausfuehrungspreis: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("UPDATE `Order` SET `Aufruehrungspreis` = '?' WHERE `Order`.`boerseOrderRefID` = ?;", [ausfuehrungspreis, boerseOrderRefID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Ausfuehrungspreis has been updated" });
+        }
+      });
+      connection.end();
+    }.bind(this))
+  }
+
   _updateBoerseOrderRefID(boerseOrderRefID: string, boerseJobRefID: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
@@ -583,7 +602,7 @@ export class AppService {
     }.bind(this))
   }
 
-  addSharesToDepot(amount: number, shareID: string, depotID: number, price: number) {
+  _addSharesToDepot(amount: number, shareID: string, depotID: number, price: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       for (var i = 0; i < amount; i++) {
         var addOneShareToDepotResult = await this._addOneShareToDepot(shareID, depotID, price);
