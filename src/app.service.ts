@@ -6,10 +6,10 @@ var passwordHash = require('password-hash');
 var mysql = require('mysql');
 const config = require('../config.json')
 
-const onPlaceURL = "https://privat.moonstonks.space//webhook/onPlace?webhookAuthToken=" + config.webhookAuthenticationToken;
-const onMatchURL = "https://privat.moonstonks.space//webhook/onMatch?webhookAuthToken=" + config.webhookAuthenticationToken;
-const onCompleteURL = "https://privat.moonstonks.space//webhook/onComplete?webhookAuthToken=" + config.webhookAuthenticationToken;
-const onDeleteURL = "https://privat.moonstonks.space//webhook/onDelete?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onPlaceURL = "http://privat.moonstonks.space:3001/webhook/onPlace?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onMatchURL = "http://privat.moonstonks.space:3001/webhook/onMatch?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onCompleteURL = "http://privat.moonstonks.space:3001/webhook/onComplete?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onDeleteURL = "http://privat.moonstonks.space:3001/webhook/onDelete?webhookAuthToken=" + config.webhookAuthenticationToken;
 
 const api = new BörsenAPI(config.MoonAuthenticationToken);
 const orderManager: OrderManager = new OrderManager(api, onPlaceURL, onMatchURL, onCompleteURL, onDeleteURL);
