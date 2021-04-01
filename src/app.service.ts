@@ -462,7 +462,7 @@ export class AppService {
     return new Promise<callResult>(async function (resolve, reject) {
       console.log(body.id)
       console.log(body.jobId)
-      this._updateBoerseOrderRefID(body.id, body.jobId)
+      await this._updateBoerseOrderRefID(body.id, body.jobId)
       resolve({success: true, message: "Success"});
     }.bind(this));
   }
