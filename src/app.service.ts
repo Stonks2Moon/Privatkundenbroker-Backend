@@ -6,7 +6,7 @@ var passwordHash = require('password-hash');
 var mysql = require('mysql');
 const config = require('../config.json')
 
-const onPlaceURL = "http://10.58.239.143:3001/webhook/onPlace?webhookAuthToken=" + config.webhookAuthenticationToken;
+const onPlaceURL = "http://10.58.239.142:3001/webhook/onPlace?webhookAuthToken=" + config.webhookAuthenticationToken;
 const onMatchURL = "http://10.58.239.142:3001/webhook/onMatch?webhookAuthToken=" + config.webhookAuthenticationToken;
 const onCompleteURL = "http://10.58.239.142:3001/webhook/onComplete?webhookAuthToken=" + config.webhookAuthenticationToken;
 const onDeleteURL = "http://10.58.239.142:3001/webhook/onDelete?webhookAuthToken=" + config.webhookAuthenticationToken;
@@ -478,8 +478,8 @@ export class AppService {
         console.log(body);
         var updateOrderStatusResult = await this._updateOrderStatusID(2, body.orderId);
         console.log(updateOrderStatusResult);
-        var updateAusfuehrungspreisInDatabaseResult = await this._updateAusfuehrungspreisInDatabase(body.orderId, body.price)
-        console.log(updateAusfuehrungspreisInDatabaseResult)
+        var updateAusfuehrungspreisInDatabaseResult = await this._updateAusfuehrungspreisInDatabase(body.orderId, body.price);
+        console.log(updateAusfuehrungspreisInDatabaseResult);
         resolve({ success: true, message: "Success" });
       }.bind(this), 3000);
     }.bind(this));
@@ -493,8 +493,12 @@ export class AppService {
         console.log(updateOrderStatusResult);
 
         // TODO: Wertpapiere anlegen, Transaktionskorrektur
-        //var addSharesToDepotResult = await this._addSharesToDepot()
 
+        var getOrderByBoerseOrderRefIDResult = this._getOrderByBoerseOrderRefID(body.orderId);
+        console.log(getOrderByBoerseOrderRefIDResult);
+
+        var addSharesToDepotResult = this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.Anzahl, getOrderByBoerseOrderRefIDResult.ShareRefID, getOrderByBoerseOrderRefIDResult.DepotID, getOrderByBoerseOrderRefIDResult.Ausfuehrungspreis);
+        console.log(addSharesToDepotResult);
 
         resolve({ success: true, message: "Success" });
       }.bind(this), 4000);
@@ -629,5 +633,19 @@ export class AppService {
     }.bind(this));
   }
 
+  _getOrderByBoerseOrderRefID(boerseOrderRefID: string) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("SELECT * FROM `Order` WHERE BoerseOrderRefID = ?", [boerseOrderRefID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Getting Order successful", data: results[0] });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
 
 }
