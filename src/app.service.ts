@@ -475,6 +475,7 @@ export class AppService {
     return new Promise<callResult>(async function (resolve, reject) {
       setTimeout(async function () {
         console.log("Request at webhook (onMatch) received");
+        console.log(body);
         var updateOrderStatusResult = await this._updateOrderStatusID(2, body.orderId);
         console.log(updateOrderStatusResult);
         resolve({ success: true, message: "Success" });
