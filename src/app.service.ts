@@ -500,6 +500,9 @@ export class AppService {
         var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
         console.log(addSharesToDepotResult);
 
+        var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
+        console.log(updateTransaktionsBetragResult);
+
         resolve({ success: true, message: "Success" });
       }.bind(this), 4000);
 
@@ -585,6 +588,21 @@ export class AppService {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
           resolve({ success: true, message: "BoerseOrderRefID has been updated", additionalInfo: { BoerseOrderRefID: boerseOrderRefID, BoerseJobRefID: boerseJobRefID } });
+        }
+      });
+      connection.end();
+    }.bind(this))
+  }
+
+  _updateTransaktionsBetrag(transaktionsID: number, betrag: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("UPDATE `Transaktion` SET `Betrag` = ? WHERE `Transaktion`.`TransaktionsID` = ?;", [betrag, transaktionsID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Transaktionsbetrag has been updated" });
         }
       });
       connection.end();
