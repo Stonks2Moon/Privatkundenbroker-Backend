@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common'
 import { AppService } from './app.service';
 import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
-  createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties,
+  createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties, initiateAuszahlungQueryProperties,
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
   webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties } from './app.apiproperties';
 
@@ -123,6 +123,26 @@ export class AppController {
     }.bind(this));
   }
   
+  @Post("/initiateAuszahlung")
+  async initiateAuszahlung(@Query() initiateAuszahlungQueryProperties: initiateAuszahlungQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(initiateAuszahlungQueryProperties.email, initiateAuszahlungQueryProperties.hashedPassword);
+      
+      if (loginWithPasswordHashResult.success) {
+        // Check if balance is available
+        var getBalanceOfVerrechnungskontoResult = await this.appService.getBalanceOfVerrechnungskonto(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        if(getBalanceOfVerrechnungskontoResult.data.Guthaben >= initiateAuszahlungQueryProperties.amount && initiateAuszahlungQueryProperties.amount > 0) {
+          var createTransactionAsAdminResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Auszahlug", (-1) * initiateAuszahlungQueryProperties.amount, initiateAuszahlungQueryProperties.IBAN);
+          resolve(createTransactionAsAdminResult);
+        } else {
+          resolve({ success: false, message: "Insufficient funds" });
+        }
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this)); 
+  }
+
   
   @Post("/createTransactionAsAdmin")
   async createTransactionAsAdmin(@Query() createTransactionAsAdminQueryProperties: createTransactionAsAdminQueryProperties): Promise<string> {
@@ -454,6 +474,7 @@ export class AppController {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnPlaceQueryProperties.webhookAuthToken)) {
         var webhookOnPlaceResult = await this.appService.webhookOnPlace();
+        console.log(webhookOnPlaceBodyParameter);
         resolve(JSON.stringify(webhookOnPlaceResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
@@ -462,10 +483,12 @@ export class AppController {
   }
 
   @Post("/webhook/onMatch")
-  async webhookOnMatch(@Query() webhookOnMatchQueryProperties: webhookOnMatchQueryProperties): Promise<string> {
+  async webhookOnMatch(@Query() webhookOnMatchQueryProperties: webhookOnMatchQueryProperties, @Body() webhookOnMatchBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnMatchQueryProperties.webhookAuthToken)) {
         var webhookOnMatchResult = await this.appService.webhookOnMatch();
+        console.log(webhookOnMatchBodyParameter);
+
         resolve(JSON.stringify(webhookOnMatchResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
@@ -474,10 +497,12 @@ export class AppController {
   }
 
   @Post("/webhook/onComplete")
-  async webhookOnComplete(@Query() webhookOnCompleteQueryProperties: webhookOnCompleteQueryProperties): Promise<string> {
+  async webhookOnComplete(@Query() webhookOnCompleteQueryProperties: webhookOnCompleteQueryProperties, @Body() webhookOnCompleteBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnCompleteQueryProperties.webhookAuthToken)) {
         var webhookOnCompleteResult = await this.appService.webhookOnComplete();
+        console.log(webhookOnCompleteBodyParameter);
+
         resolve(JSON.stringify(webhookOnCompleteResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
@@ -486,10 +511,12 @@ export class AppController {
   }
 
   @Post("/webhook/onDelete")
-  async webhookOnDelete(@Query() webhookOnDeleteQueryProperties: webhookOnDeleteQueryProperties): Promise<string> {
+  async webhookOnDelete(@Query() webhookOnDeleteQueryProperties: webhookOnDeleteQueryProperties, @Body() webhookOnDeleteBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnDeleteQueryProperties.webhookAuthToken)) {
         var webhookOnDeleteResult = await this.appService.webhookOnDelete();
+        console.log(webhookOnDeleteBodyParameter);
+
         resolve(JSON.stringify(webhookOnDeleteResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
