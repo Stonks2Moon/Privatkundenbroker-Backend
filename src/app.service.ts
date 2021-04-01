@@ -527,7 +527,7 @@ export class AppService {
     }.bind(this))
   }
 
-  _updateBoerseOrderRefID(boerseOrderRefID:number, boerseJobRefID:number) {
+  _updateBoerseOrderRefID(boerseOrderRefID:string, boerseJobRefID:number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
       connection.query("UPDATE `Order` SET `BoerseOrderRefID` = ? WHERE `Order`.`BoerseJobRefID` = ?", [boerseOrderRefID, boerseJobRefID], function (error, results, fields) {
