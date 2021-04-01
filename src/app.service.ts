@@ -462,7 +462,6 @@ export class AppService {
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
       setTimeout(async function () {
-        alert("Hello");
         console.log("Request at webhook (onPlace) received");
         var updateBoerseOrderRefIDResult = await this._updateBoerseOrderRefID(body.id, body.jobId);
         console.log(updateBoerseOrderRefIDResult);
