@@ -509,22 +509,22 @@ export class AppService {
     }.bind(this));
   }
 
-  createOrderInDatabase(depotID:number, transactionID:number, boerseOrderRefID:number, orderStatusID: number, shareRefID:string, orderTypID:number, amount:number) {
+  createOrderInDatabase(depotID:number, transactionID:number, boerseJobRefID:number, orderStatusID: number, shareRefID:string, orderTypID:number, amount:number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("INSERT INTO `Order` (`OrderID`, `DepotID`, `TransaktionsID`, `BoerseOrderRefID`, `OrderstatusID`, `ShareRefID`, `OrdertypID`, `Anzahl`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ? )", [depotID, transactionID, boerseOrderRefID, orderStatusID, shareRefID, orderTypID, amount], function (error, results, fields) {
+      connection.query("INSERT INTO `Order` (`OrderID`, `DepotID`, `TransaktionsID`, `BoerseJobRefID`, `OrderstatusID`, `ShareRefID`, `OrdertypID`, `Anzahl`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ? )", [depotID, transactionID, boerseJobRefID, orderStatusID, shareRefID, orderTypID, amount], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Orders has been created", additionalInfo: {DepotID: depotID, TransactionID: transactionID, BoerseOrderRefID: boerseOrderRefID, OrderStatusID: orderStatusID, ShareRefID: shareRefID, OrderTypID: orderTypID, Amount: amount} });
+          resolve({ success: true, message: "Orders has been created", additionalInfo: {DepotID: depotID, TransactionID: transactionID, BoerseOrderRefID: boerseJobRefID, OrderStatusID: orderStatusID, ShareRefID: shareRefID, OrderTypID: orderTypID, Amount: amount} });
         }
       });
       connection.end();
     }.bind(this))
   }
 
-  addSharesToDepot(amount:number, shareID:string, depotID:number, price: number, nutzerID:number, description:string, totalTransactionValue:number, receipient:string) {
+  addSharesToDepot(amount:number, shareID:string, depotID:number, price: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       for(var i = 0; i < amount; i++){
         var addOneShareToDepotResult = await this._addOneShareToDepot(shareID, depotID, price);
