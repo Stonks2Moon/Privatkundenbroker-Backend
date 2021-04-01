@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Query, Body } from '@nestjs/common'
 import { AppService } from './app.service';
 import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
-  createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties,
+  createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties, initiateAuszahlungQueryProperties,
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
   webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties } from './app.apiproperties';
 
@@ -123,6 +123,26 @@ export class AppController {
     }.bind(this));
   }
   
+  @Post("/initiateAuszahlung")
+  async initiateAuszahlung(@Query() initiateAuszahlungQueryProperties: initiateAuszahlungQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(initiateAuszahlungQueryProperties.email, initiateAuszahlungQueryProperties.hashedPassword);
+      
+      if (loginWithPasswordHashResult.success) {
+        // Check if balance is available
+        var getBalanceOfVerrechnungskontoResult = await this.appService.getBalanceOfVerrechnungskonto(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        if(getBalanceOfVerrechnungskontoResult.data.Guthaben >= initiateAuszahlungQueryProperties.amount && initiateAuszahlungQueryProperties.amount > 0) {
+          var createTransactionAsAdminResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Auszahlug", (-1) * initiateAuszahlungQueryProperties.amount, initiateAuszahlungQueryProperties.IBAN);
+          resolve(createTransactionAsAdminResult);
+        } else {
+          resolve({ success: false, message: "Insufficient funds" });
+        }
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this)); 
+  }
+
   
   @Post("/createTransactionAsAdmin")
   async createTransactionAsAdmin(@Query() createTransactionAsAdminQueryProperties: createTransactionAsAdminQueryProperties): Promise<string> {
