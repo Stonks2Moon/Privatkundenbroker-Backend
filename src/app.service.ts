@@ -473,7 +473,7 @@ export class AppService {
       var updateOrderStatusResult = await this._updateOrderStatusID(2, body.orderId);
       console.log(updateOrderStatusResult);
       resolve({success: true, message: "Success"});
-    });
+    }.bind(this));
   }
 
   webhookOnComplete(body) {
@@ -485,7 +485,7 @@ export class AppService {
       // TODO: Wertpapiere anlegen, Transaktionskorrektur
 
       resolve({success: true, message: "Success"});
-    });
+    }.bind(this));
   }
 
   webhookOnDelete(body) {
@@ -494,7 +494,7 @@ export class AppService {
       var updateOrderStatusResult = await this._updateOrderStatusID(4, body.orderId);
       console.log(updateOrderStatusResult);
       resolve({success: true, message: "Success"});
-    });
+    }.bind(this));
   }
 
   _getTimestampOfLastNight() {
