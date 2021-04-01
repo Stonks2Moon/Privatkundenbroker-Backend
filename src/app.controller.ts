@@ -348,6 +348,7 @@ export class AppController {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnPlaceQueryProperties.webhookAuthToken)) {
         var webhookOnPlaceResult = await this.appService.webhookOnPlace();
+        console.log(webhookOnPlaceBodyParameter);
         resolve(JSON.stringify(webhookOnPlaceResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
@@ -356,10 +357,12 @@ export class AppController {
   }
 
   @Post("/webhook/onMatch")
-  async webhookOnMatch(@Query() webhookOnMatchQueryProperties: webhookOnMatchQueryProperties): Promise<string> {
+  async webhookOnMatch(@Query() webhookOnMatchQueryProperties: webhookOnMatchQueryProperties, @Body() webhookOnMatchBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnMatchQueryProperties.webhookAuthToken)) {
         var webhookOnMatchResult = await this.appService.webhookOnMatch();
+        console.log(webhookOnMatchBodyParameter);
+
         resolve(JSON.stringify(webhookOnMatchResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
@@ -368,10 +371,12 @@ export class AppController {
   }
 
   @Post("/webhook/onComplete")
-  async webhookOnComplete(@Query() webhookOnCompleteQueryProperties: webhookOnCompleteQueryProperties): Promise<string> {
+  async webhookOnComplete(@Query() webhookOnCompleteQueryProperties: webhookOnCompleteQueryProperties, @Body() webhookOnCompleteBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnCompleteQueryProperties.webhookAuthToken)) {
         var webhookOnCompleteResult = await this.appService.webhookOnComplete();
+        console.log(webhookOnCompleteBodyParameter);
+
         resolve(JSON.stringify(webhookOnCompleteResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
@@ -380,10 +385,12 @@ export class AppController {
   }
 
   @Post("/webhook/onDelete")
-  async webhookOnDelete(@Query() webhookOnDeleteQueryProperties: webhookOnDeleteQueryProperties): Promise<string> {
+  async webhookOnDelete(@Query() webhookOnDeleteQueryProperties: webhookOnDeleteQueryProperties, @Body() webhookOnDeleteBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnDeleteQueryProperties.webhookAuthToken)) {
         var webhookOnDeleteResult = await this.appService.webhookOnDelete();
+        console.log(webhookOnDeleteBodyParameter);
+
         resolve(JSON.stringify(webhookOnDeleteResult));
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
