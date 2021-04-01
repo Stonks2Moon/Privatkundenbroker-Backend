@@ -542,6 +542,21 @@ export class AppService {
     }.bind(this))
   }
 
+  _updateOrderStatusID(orderStatusID:number, boerseJobRefID:number,) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("UPDATE `Order` SET `OrderStatusID` = ? WHERE `Order`.`BoerseJobRefID` = ?", [orderStatusID, boerseJobRefID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "OrderStatusID has been updated", additionalInfo: {OrderStatusID: orderStatusID, BoerseJobRefID: boerseJobRefID} });
+        }
+      });
+      connection.end();
+    }.bind(this))
+  }
+
   addSharesToDepot(amount:number, shareID:string, depotID:number, price: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       for(var i = 0; i < amount; i++){
