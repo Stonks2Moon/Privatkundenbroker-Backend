@@ -460,10 +460,9 @@ export class AppService {
 
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
-      console.log(body);
-      console.log(body.jobId);
+      this._updateBoerseOrderRefID(body.id, body.jobId)
       resolve({success: true, message: "Success"});
-    });
+    }.bind(this));
   }
 
   webhookOnMatch(body) {
@@ -526,7 +525,7 @@ export class AppService {
     }.bind(this))
   }
 
-  updateBoerseOrderRefID(boerseOrderRefID:number, boerseJobRefID:number) {
+  _updateBoerseOrderRefID(boerseOrderRefID:number, boerseJobRefID:number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
       connection.query("UPDATE `Order` SET `BoerseOrderRefID` = ? WHERE `Order`.`BoerseJobRefID` = ?", [boerseOrderRefID, boerseJobRefID], function (error, results, fields) {
