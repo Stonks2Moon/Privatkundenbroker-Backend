@@ -362,6 +362,42 @@ export class AppService {
     }.bind(this));
   }
 
+  sellMarketOrder(shareID: string, amount: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      await orderManager.placeSellMarketOrder(shareID, Number(amount))
+        .then((res) => resolve({ success: true, message: "The sell market order was successfully placed", data: res }))
+        .catch((err) => resolve({ success: false, message: "Failed to place the sell market order", additionalInfo: err }));
+    }.bind(this));
+  }
+
+  sellStopMarketOrder(shareID: string, amount: number, stop: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      await orderManager.placeSellStopMarketOrder(shareID, Number(amount), Number(stop))
+        .then((res) => resolve({ success: true, message: "The sell stop market order was successfully placed", data: res }))
+        .catch((err) => resolve({ success: false, message: "Failed to place the sell stop market order", additionalInfo: err }));
+    }.bind(this));
+  }
+
+  sellLimitOrder(shareID: string, amount: number, limit: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      await orderManager.placeSellLimitOrder(shareID, Number(amount), Number(limit))
+        .then((res) => resolve({ success: true, message: "The sell limit order was successfully placed", data: res }))
+        .catch((err) => resolve({ success: false, message: "Failed to place the sell limit order", additionalInfo: err }));
+    }.bind(this));
+  }
+
+  sellStopLimitOrder(shareID: string, amount: number, limit: number, stop: number): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      await orderManager.placeSellStopLimitOrder(shareID, Number(amount), Number(limit), Number(stop))
+        .then((res) => resolve({ success: true, message: "The sell stop limit order was successfully placed", data: res }))
+        .catch((err) => resolve({ success: false, message: "Failed to place the sell stop limit order", additionalInfo: err }));
+    }.bind(this));
+  }
+
   checkAmount(amount:number) {
     return new Promise<callResult>(async function (resolve, reject) {
       if(Number(amount) <= config.maxOrderAmount){
@@ -383,6 +419,26 @@ export class AppService {
       }else{
         resolve({ success: false, message: "There is not enough money on the account", additionalInfo: {totalTransactionValue: totalTransactionValue, AccountMoney: getBalanceOfVerrechnungskontoResult.data.Guthaben}})
       }
+    }.bind(this))
+  }
+
+  checkIfDepotHasEnoughShares(amount:number, shareID:string, nutzerID: number, depotID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      
+      var allOwnedSharesResult: callResult = await this.getAllOwnedWertpapiereFromDatabase(nutzerID, depotID);
+
+      if(allOwnedSharesResult.success){
+        var depotShare = allOwnedSharesResult.data.find(x => x.ISIN === shareID);
+
+        if( amount <= depotShare.count){
+          resolve({success: true, message: "Enough shares in the depot", additionalInfo: { ShareID: shareID, Amount: amount } });  
+        }else{
+          resolve({success: false, message: "Not enough shares in the depot", additionalInfo: { SharedID: shareID, DepotAmount: depotShare.count, SellAmount: amount } });  
+        }
+      }else {
+        resolve(allOwnedSharesResult);
+      }
+
     }.bind(this))
   }
 
@@ -481,5 +537,6 @@ export class AppService {
       connection.end();
     }.bind(this));
   }
+
 
 }

@@ -367,6 +367,56 @@ export class buyOrderQueryProperties {
     stop: number;
 }
 
+export class sellOrderQueryProperties {
+    @ApiProperty({
+        description: "EMail",
+        default: "test@tjbn.de"
+    })
+    email: string;
+    
+    @ApiProperty({
+        description: "PasswordHash",
+        default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
+    })
+    hashedPassword: string;
+
+    @ApiProperty({
+        description: "DepotID",
+        default: "9"
+    })
+    depotID: number;
+
+    @ApiProperty({
+        description: "ShareID",
+        default: "6037e67c8407c737441517d6"
+    })
+    shareID: string;
+
+    @ApiProperty({
+        description: "Type (f.e. Market, Stop Market, Limit or Stop Limit)",
+        default: "Market"
+    })
+    type: string;
+
+    @ApiProperty({
+        description: "Amount",
+        default: 1
+    })
+    amount: number;
+
+    @ApiPropertyOptional({
+        description: "Limit",
+        default: "18"
+    })
+    limit: number;
+
+    @ApiPropertyOptional({
+        description: "Stop",
+        default: "1"
+    })
+    stop: number;
+}
+
 export class checkIfMarketIsOpenQueryProperties {
     @ApiProperty({
         description: "EMail",
