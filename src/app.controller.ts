@@ -3,7 +3,8 @@ import { AppService } from './app.service';
 import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWithPasswordHashQueryProperties, 
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties,
-  getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, checkIfMarketIsOpenQueryProperties } from './app.apiproperties';
+  getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
+  webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties } from './app.apiproperties';
 
 @Controller()
 export class AppController {
@@ -322,6 +323,57 @@ export class AppController {
     }.bind(this));
   }
 
+  @Post("/webhook/onPlace")
+  async webhookOnPlace(@Query() webhookOnPlaceQueryProperties: webhookOnPlaceQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      if(this.appService.validateWebhookAuthToken(webhookOnPlaceQueryProperties.webhookAuthToken)) {
+        //var removeContactResult = await this.appService.removeContact(webhookOnPlaceQueryProperties.additionalInfo.PID);
+        //resolve(JSON.stringify(removeContactResult));
+        resolve({success: true, message: "Success"});
+      } else {
+        resolve({success: false, message: "Wrong webhookAuthToken"});
+      }
+    }.bind(this));
+  }
+
+  @Post("/webhook/onMatch")
+  async webhookOnMatch(@Query() webhookOnMatchQueryProperties: webhookOnMatchQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      if(this.appService.validateWebhookAuthToken(webhookOnMatchQueryProperties.webhookAuthToken)) {
+        //var removeContactResult = await this.appService.removeContact(webhookOnPlaceQueryProperties.additionalInfo.PID);
+        //resolve(JSON.stringify(removeContactResult));
+        resolve({success: true, message: "Success"});
+      } else {
+        resolve({success: false, message: "Wrong webhookAuthToken"});
+      }
+    }.bind(this));
+  }
+
+  @Post("/webhook/onComplete")
+  async webhookOnComplete(@Query() webhookOnCompleteQueryProperties: webhookOnCompleteQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      if(this.appService.validateWebhookAuthToken(webhookOnCompleteQueryProperties.webhookAuthToken)) {
+        //var removeContactResult = await this.appService.removeContact(webhookOnPlaceQueryProperties.additionalInfo.PID);
+        //resolve(JSON.stringify(removeContactResult));
+        resolve({success: true, message: "Success"});
+      } else {
+        resolve({success: false, message: "Wrong webhookAuthToken"});
+      }
+    }.bind(this));
+  }
+
+  @Post("/webhook/onDelete")
+  async webhookOnDelete(@Query() webhookOnDeleteQueryProperties: webhookOnDeleteQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      if(this.appService.validateWebhookAuthToken(webhookOnDeleteQueryProperties.webhookAuthToken)) {
+        //var removeContactResult = await this.appService.removeContact(webhookOnPlaceQueryProperties.additionalInfo.PID);
+        //resolve(JSON.stringify(removeContactResult));
+        resolve({success: true, message: "Success"});
+      } else {
+        resolve({success: false, message: "Wrong webhookAuthToken"});
+      }
+    }.bind(this));
+  }
 }
 
 

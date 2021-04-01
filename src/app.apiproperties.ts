@@ -354,3 +354,31 @@ export class checkIfMarketIsOpenQueryProperties {
     })
     hashedPassword: string;
 }
+
+export class webhookOnPlaceQueryProperties {
+    @ApiProperty({
+        description: "WebhookAuthToken",
+    })
+    webhookAuthToken: string;
+}
+
+export class webhookOnMatchQueryProperties {
+    @ApiProperty({
+        description: "WebhookAuthToken",
+    })
+    webhookAuthToken: string;
+}
+
+export class webhookOnCompleteQueryProperties {
+    @ApiProperty({
+        description: "WebhookAuthToken",
+    })
+    webhookAuthToken: string;
+}
+
+export class webhookOnDeleteQueryProperties {
+    @ApiProperty({
+        description: "WebhookAuthToken",
+    })
+    webhookAuthToken: string;
+}

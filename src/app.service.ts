@@ -390,6 +390,14 @@ export class AppService {
     });
   }
 
+  validateWebhookAuthToken(webhookAuthToken: string) {
+    if(webhookAuthToken == config.webhookAuthenticationToken) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   _getTimestampOfLastNight() {
     var now = new Date;
     now.setHours(0);
