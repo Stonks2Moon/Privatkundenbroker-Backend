@@ -460,6 +460,7 @@ export class AppService {
 
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
+      console.log("!");
       var updateBoerseOrderRefIDResult = await this._updateBoerseOrderRefID(body.id, body.jobId);
       console.log(updateBoerseOrderRefIDResult);
       resolve({success: true, message: "Success"});
