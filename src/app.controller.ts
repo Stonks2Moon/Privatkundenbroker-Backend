@@ -473,7 +473,8 @@ export class AppController {
   async webhookOnPlace(@Query() webhookOnPlaceQueryProperties: webhookOnPlaceQueryProperties, @Body() webhookOnPlaceBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnPlaceQueryProperties.webhookAuthToken)) {
-        var webhookOnPlaceResult = await this.appService.webhookOnPlace();
+        webhookOnPlaceBodyParameter = JSON.parse(webhookOnPlaceBodyParameter);
+        var webhookOnPlaceResult = await this.appService.webhookOnPlace(webhookOnPlaceBodyParameter);
         console.log(webhookOnPlaceBodyParameter);
         resolve(JSON.stringify(webhookOnPlaceResult));
       } else {
@@ -486,7 +487,8 @@ export class AppController {
   async webhookOnMatch(@Query() webhookOnMatchQueryProperties: webhookOnMatchQueryProperties, @Body() webhookOnMatchBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnMatchQueryProperties.webhookAuthToken)) {
-        var webhookOnMatchResult = await this.appService.webhookOnMatch();
+        webhookOnMatchBodyParameter = JSON.parse(webhookOnMatchBodyParameter);
+        var webhookOnMatchResult = await this.appService.webhookOnMatch(webhookOnMatchBodyParameter);
         console.log(webhookOnMatchBodyParameter);
 
         resolve(JSON.stringify(webhookOnMatchResult));
@@ -500,6 +502,7 @@ export class AppController {
   async webhookOnComplete(@Query() webhookOnCompleteQueryProperties: webhookOnCompleteQueryProperties, @Body() webhookOnCompleteBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnCompleteQueryProperties.webhookAuthToken)) {
+        webhookOnCompleteBodyParameter = JSON.parse(webhookOnCompleteBodyParameter);
         var webhookOnCompleteResult = await this.appService.webhookOnComplete(webhookOnCompleteBodyParameter);
         console.log(webhookOnCompleteBodyParameter);
 
@@ -514,7 +517,8 @@ export class AppController {
   async webhookOnDelete(@Query() webhookOnDeleteQueryProperties: webhookOnDeleteQueryProperties, @Body() webhookOnDeleteBodyParameter): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       if(this.appService.validateWebhookAuthToken(webhookOnDeleteQueryProperties.webhookAuthToken)) {
-        var webhookOnDeleteResult = await this.appService.webhookOnDelete();
+        webhookOnDeleteBodyParameter = JSON.parse(webhookOnDeleteBodyParameter);
+        var webhookOnDeleteResult = await this.appService.webhookOnDelete(webhookOnDeleteBodyParameter);
         console.log(webhookOnDeleteBodyParameter);
 
         resolve(JSON.stringify(webhookOnDeleteResult));
