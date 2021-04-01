@@ -402,6 +402,30 @@ export class AppService {
     }
   }
 
+  webhookOnPlace(body) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      resolve({success: true, message: "Success"});
+    });
+  }
+
+  webhookOnMatch(body) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      resolve({success: true, message: "Success"});
+    });
+  }
+
+  webhookOnComplete(body) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      resolve({success: true, message: "Success"});
+    });
+  }
+
+  webhookOnDelete(body) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      resolve({success: true, message: "Success"});
+    });
+  }
+
   _getTimestampOfLastNight() {
     var now = new Date;
     now.setHours(0);
