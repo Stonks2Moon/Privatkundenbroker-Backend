@@ -5,7 +5,7 @@ import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWit
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties, initiateAuszahlungQueryProperties,
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
   getInvoicesQueryProperties, webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, 
-  webhookTestProperties, deleteOrderQueryProperties } from './app.apiproperties';
+  webhookTestProperties, deleteOrderQueryProperties, getOrdersQueryProperties } from './app.apiproperties';
 
 const config = require('../config.json')
 
@@ -558,6 +558,29 @@ export class AppController {
           }
         }else{
           resolve(marketIsOpenResult);
+        }
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+
+  @Get("/getOrders")
+  async getOrders(@Query() getOrdersQueryProperties: getOrdersQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getOrdersQueryProperties.email, getOrdersQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+        var hasAccessToDepot = false;
+        for(var i = 0; i < loginWithPasswordHashResult.additionalInfo.depotIDs.length; i++) {
+          if(loginWithPasswordHashResult.additionalInfo.depotIDs[i] == getOrdersQueryProperties.depotID) {
+            hasAccessToDepot = true;
+          }
+        }
+        if(hasAccessToDepot){
+          var getOrdersResult = await this.appService.getOrders(getOrdersQueryProperties.depotID);
+          resolve(getOrdersResult);
+        } else {
+          resolve({ sucess: false, message: "The requested depot doesn't belong to the logged in User!"});
         }
       } else {
         resolve(loginWithPasswordHashResult);
