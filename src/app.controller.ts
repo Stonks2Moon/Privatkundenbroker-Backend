@@ -4,7 +4,7 @@ import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWit
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties, initiateAuszahlungQueryProperties,
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
-  webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, webhookTestProperties } from './app.apiproperties';
+  webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, webhookTestProperties, deleteOrderQueryProperties } from './app.apiproperties';
 
 @Controller()
 export class AppController {
@@ -529,6 +529,31 @@ export class AppController {
             resolve(checkAmountResult);
           }
         }else {
+          resolve(marketIsOpenResult);
+        }
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+
+  @Delete("/order")
+  async deleteOrder(@Query() deleteOrderQueryProperties: deleteOrderQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(deleteOrderQueryProperties.email, deleteOrderQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+
+        //Check if market is open
+        var marketIsOpenResult = await this.appService.checkIfMarketIsOpen();
+        if(marketIsOpenResult.success){
+          var checkOrderStatusResult = await this.appService.checkOrderStatus(deleteOrderQueryProperties.depotID, deleteOrderQueryProperties.orderID, 1)
+          
+          if(checkOrderStatusResult.success){
+            //Call an Börse zum Deleten der Order
+          }else{
+            resolve(checkOrderStatusResult)
+          }
+        }else{
           resolve(marketIsOpenResult);
         }
       } else {
