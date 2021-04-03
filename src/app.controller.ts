@@ -135,7 +135,7 @@ export class AppController {
         // Check if balance is available
         var getBalanceOfVerrechnungskontoResult = await this.appService.getBalanceOfVerrechnungskonto(loginWithPasswordHashResult.additionalInfo.NutzerID);
         if(getBalanceOfVerrechnungskontoResult.data.Guthaben >= initiateAuszahlungQueryProperties.amount && initiateAuszahlungQueryProperties.amount > 0) {
-          var createTransactionAsAdminResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Auszahlug", (-1) * initiateAuszahlungQueryProperties.amount, initiateAuszahlungQueryProperties.IBAN);
+          var createTransactionAsAdminResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Auszahlung", (-1) * initiateAuszahlungQueryProperties.amount, initiateAuszahlungQueryProperties.IBAN);
           resolve(createTransactionAsAdminResult);
         } else {
           resolve({ success: false, message: "Insufficient funds" });
