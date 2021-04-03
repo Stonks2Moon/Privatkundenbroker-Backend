@@ -556,7 +556,7 @@ export class AppController {
   }
 
   @Get("/getRechnungen")
-  async getRechnungen(@Query() checkIfMarketIsOpengetRechungenQueryProperties: getRechungenQueryProperties): Promise<string> {
+  async getRechnungen(@Query() getRechungenQueryProperties: getRechungenQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getRechungenQueryProperties.email, getRechungenQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
