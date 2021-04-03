@@ -447,6 +447,37 @@ export class AppService {
     }.bind(this))
   }
 
+  checkOrderStatus(depotID:number, orderID: number, orderStatusID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      var getOrdersResult = await this.getOrders(depotID);
+      if (getOrdersResult.success) {
+        var order = getOrdersResult.data.find(x => x.OrderID === orderID)
+        if (orderStatusID === order.OrderstatusID) {
+          resolve({ success: true, message: "Order status matches"});
+        } else {
+          resolve({ success: false, message: "Order status doesn't match" });
+        }
+      } else {
+        resolve(getOrdersResult);
+      }
+    }.bind(this))
+  }
+
+  getOrders(depotID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("SELECT `Order`.* FROM `Order` JOIN Orderstatus ON `Order`.`OrderstatusID` = Orderstatus.OrderstatusID WHERE DepotID = ?", [depotID], function (error, results, fields) {
+        if (error) {
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Orders have been received", data: results });
+        }
+      });
+      connection.end();
+    }.bind(this))
+  }
+
   checkIfMarketIsOpen() {
     return new Promise<callResult>(async function (resolve, reject) {
       await MarketManager.isOpen()
@@ -555,7 +586,28 @@ export class AppService {
         console.log("Request at webhook (onDelete) received");
         var updateOrderStatusResult = await this._updateOrderStatusID(4, body.orderId);
         console.log(updateOrderStatusResult);
+
+        var getOrderByBoerseOrderRefIDResult = await this._getOrderByBoerseOrderRefID(body.orderId);
+        console.log(getOrderByBoerseOrderRefIDResult);
+
+        if (getOrderByBoerseOrderRefIDResult.data.OrdertypID === 1) { //SELL
+          //Adjust share state from blocked to unblocked
+          var setBlockedStatusForSharesResult = await this.setBlockedStatusForShares(getOrderByBoerseOrderRefIDResult.data.depotID, getOrderByBoerseOrderRefIDResult.data.shareID, getOrderByBoerseOrderRefIDResult.data.amount, 0)
+          console.log(setBlockedStatusForSharesResult)
+          
+          var updateTransaktionDescriptionResult = await this._updateTransaktionDescription(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, "ABBRUCH: Aktienverkauf")
+          console.log(updateTransaktionDescriptionResult);
+
+        }else{ //BUY
+          //Update the transaction value
+          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, 0)
+          console.log(updateTransaktionsBetragResult);
+
+          var updateTransaktionDescriptionResult = await this._updateTransaktionDescription(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, "ABBRUCH: Aktienkauf")
+          console.log(updateTransaktionDescriptionResult);
+        }
         resolve({ success: true, message: "Success" });
+
       }.bind(this), 5000);
 
     }.bind(this));
@@ -702,6 +754,21 @@ export class AppService {
     }.bind(this))
   }
 
+  _updateTransaktionDescription(transaktionsID: number, description: string) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("UPDATE `Transaktion` SET `Beschreibung` = ? WHERE `Transaktion`.`TransaktionsID` = ?;", [description, transaktionsID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Transaction description has been updated" });
+        }
+      });
+      connection.end();
+    }.bind(this))
+  }
+
   _updateOrderStatusID(orderStatusID: number, boerseOrderRefID: number,) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
@@ -795,20 +862,9 @@ export class AppService {
 
   _testWebhook(boerseOrderRefID: string) {
     return new Promise(async function (resolve, reject) {
-      var getOrderResult = await this._getOrderByBoerseOrderRefID(boerseOrderRefID);
-      var shares = await this._getSharesInDepotForSpecificBlockedStatus(10, "testISIN", 1)
+      var updateTransaktionDescriptionResult = await this._updateTransaktionDescription(217, "ABBRUCH: Aktienkauf")
 
-      console.log(shares)
-
-      var check = await this.checkIfDepotHasEnoughShares(3, "testISIN", 23, 10)
-
-      console.log(check);
-
-      if (getOrderResult.data.OrdertypID === 1) { //SELL
-        resolve({ success: true, message: "SELL" });
-      } else {
-        resolve({ success: true, message: "BUY" }); //BUY
-      }
+      resolve(updateTransaktionDescriptionResult);
 
     }.bind(this));
   }
