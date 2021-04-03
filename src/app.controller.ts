@@ -273,7 +273,7 @@ export class AppController {
                     var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
                     if(buyMarketOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
@@ -301,7 +301,7 @@ export class AppController {
                     
                     if(buyStopMarketOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
@@ -329,7 +329,7 @@ export class AppController {
                     
                     if(buyLimitOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
@@ -357,7 +357,7 @@ export class AppController {
                     
                     if(buyStopLimitOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, "TODO")
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
@@ -398,6 +398,10 @@ export class AppController {
     return new Promise<string>(async function (resolve, reject) {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(sellOrderQueryProperties.email, sellOrderQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
+        var getNutzerResult = await this.appService.getNutzer(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        if(!getNutzerResult.success){
+          resolve(getNutzerResult)
+        }
         //Check if market is open
         var marketIsOpenResult = await this.appService.checkIfMarketIsOpen();
         if(marketIsOpenResult.success){
@@ -418,7 +422,7 @@ export class AppController {
                      
                       if(setBlockedStatusForSharesResult.success){
                         //Execute the transaction on the database
-                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, getNutzerResult.data.VerrechnungskontoIBAN)
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
@@ -444,7 +448,7 @@ export class AppController {
                       
                       if(setBlockedStatusForSharesResult.success){
                         //Execute the transaction on the database
-                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, getNutzerResult.data.VerrechnungskontoIBAN)
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
@@ -470,7 +474,7 @@ export class AppController {
                       
                       if(setBlockedStatusForSharesResult.success){
                         //Execute the transaction on the database
-                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, getNutzerResult.data.VerrechnungskontoIBAN)
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
@@ -496,7 +500,7 @@ export class AppController {
                       
                       if(setBlockedStatusForSharesResult.success){
                         //Execute the transaction on the database
-                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, getNutzerResult.data.VerrechnungskontoIBAN)
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
