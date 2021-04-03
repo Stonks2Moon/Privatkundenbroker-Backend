@@ -6,6 +6,8 @@ import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWit
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
   webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, webhookTestProperties } from './app.apiproperties';
 
+const config = require('../config.json')
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -273,7 +275,7 @@ export class AppController {
                     var buyMarketOrderResult = await this.appService.buyMarketOrder(buyOrderQueryProperties.shareID, buyOrderQueryProperties.amount);
                     if(buyMarketOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue - config.transactionFee, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
@@ -301,7 +303,7 @@ export class AppController {
                     
                     if(buyStopMarketOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue - config.transactionFee, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
@@ -329,7 +331,7 @@ export class AppController {
                     
                     if(buyLimitOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue - config.transactionFee, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
@@ -357,7 +359,7 @@ export class AppController {
                     
                     if(buyStopLimitOrderResult.success){
                       //Execute the transaction on the database
-                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue, buyOrderQueryProperties.depotID)
+                      var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienkauf: " +  buyOrderQueryProperties.shareID, -checkIfEnoughMoneyOnAccountResult.additionalInfo.totalTransactionValue - config.transactionFee, buyOrderQueryProperties.depotID)
                       
                       if(createTransactionResult.success){
                         //Create an order in the database
