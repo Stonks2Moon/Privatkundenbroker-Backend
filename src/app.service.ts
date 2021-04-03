@@ -816,7 +816,7 @@ export class AppService {
   _createRechnungsposition(rechnungsID: number, stueckzahl: number, bezeichnung: string, amount: string) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("INSERT INTO Rechnungsposition (RechnungsID, Stueckzahl, Bezeichnung, Wert) VALUES (?, ?, ?)", [rechnungsID, stueckzahl, bezeichnung, amount], function (error, results, fields) {
+      connection.query("INSERT INTO Rechnungsposition (RechnungsID, Stueckzahl, Bezeichnung, Wert) VALUES (?, ?, ?, ?)", [rechnungsID, stueckzahl, bezeichnung, amount], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
