@@ -494,6 +494,21 @@ export class AppService {
     }
   }
 
+  getRechnungen(nutzerID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query('SELECT ISIN, AVG(Kaufpreis) AS avgKaufpreis, SUM(Kaufpreis) AS totalKaufpreis, Blockiert, COUNT(*) AS count FROM `Wertpapier` NATURAL JOIN Depot WHERE DepotID = ? AND NutzerID = ? GROUP BY ISIN, Blockiert', [nutzerID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Owned Wertpapiere have been obtained", data: results });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
       setTimeout(async function () {
@@ -537,16 +552,25 @@ export class AppService {
           var removeSharesFromDepotResult = await this._removeSharesFromDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID);
           console.log(removeSharesFromDepotResult);
 
-          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
+          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl - config.transactionFee)
           console.log(updateTransaktionsBetragResult);
+
+          // Create Rechnung
+          var createRechnungResult = await this._createRechnung(getOrderByBoerseOrderRefIDResult.data.NutzerID, 1, "Wertpapierverkauf Abrechnung");
+          var createRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, getOrderByBoerseOrderRefIDResult.data.Anzahl, "Wertpapier: " + getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl);
+          var createFeeRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, 2, "Transaktionsgebühr", -10);
 
         } else { //BUY
           var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
           console.log(addSharesToDepotResult);
 
-          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
+          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * ( getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl ) - config.transactionFee)
           console.log(updateTransaktionsBetragResult);
 
+          // Create Rechnung
+          var createRechnungResult = await this._createRechnung(getOrderByBoerseOrderRefIDResult.data.NutzerID, 1, "Wertpapierkauf Abrechnung");
+          var createRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, getOrderByBoerseOrderRefIDResult.data.Anzahl, "Wertpapier: " + getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl);
+          var createFeeRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, 1, "Transaktionsgebühr", 10);
         }
 
         resolve({ success: true, message: "Success" });
@@ -824,7 +848,7 @@ export class AppService {
   _getOrderByBoerseOrderRefID(boerseOrderRefID: string) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("SELECT * FROM `Order` WHERE BoerseOrderRefID = ?", [boerseOrderRefID], function (error, results, fields) {
+      connection.query("SELECT * FROM `Order` JOIN `Depot` ON `Order`.`DepotID` = `Depot`.`DepotID` WHERE BoerseOrderRefID = ?", [boerseOrderRefID], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
@@ -845,15 +869,30 @@ export class AppService {
     }.bind(this));
   }
 
-  _createRechnung(title: string) {
+  _createRechnung(nutzerID: number, rechnungstypID: number, title: string) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("INSERT INTO Rechnung (Titel) VALUES (?)", [title], function (error, results, fields) {
+      connection.query("INSERT INTO Rechnung (NutzerID, RechnungstypID, Titel) VALUES (?, ?, ?)", [nutzerID, rechnungstypID, title], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Rechnung has been created", additionalInfo: results.insertId });
+          resolve({ success: true, message: "Rechnung has been created", additionalInfo: { RechnungsID: results.insertId } });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  _createRechnungsposition(rechnungsID: number, stueckzahl: number, bezeichnung: string, amount: string) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("INSERT INTO Rechnungsposition (RechnungsID, Stueckzahl, Bezeichnung, Wert) VALUES (?, ?, ?, ?)", [rechnungsID, stueckzahl, bezeichnung, amount], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Rechnungsposition has been created", additionalInfo: results.insertId });
         }
       });
       connection.end();
