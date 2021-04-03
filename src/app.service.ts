@@ -431,10 +431,14 @@ export class AppService {
       if (allOwnedSharesResult.success) {
         var depotShare = allOwnedSharesResult.data.filter(x => x.Blockiert === 0).find(x => x.ISIN === shareID);
 
-        if (amount <= depotShare.count) {
-          resolve({ success: true, message: "Enough shares in the depot", additionalInfo: { ShareID: shareID, Amount: amount } });
-        } else {
-          resolve({ success: false, message: "Not enough shares in the depot", additionalInfo: { SharedID: shareID, DepotAmount: depotShare.count, SellAmount: amount } });
+        if(depotShare === undefined){
+          resolve({ success: false, message: "Not enough shares in the depot", additionalInfo: { SharedID: shareID, DepotAmount: 0, SellAmount: amount } });
+        }else{
+          if (amount <= depotShare.count) {
+            resolve({ success: true, message: "Enough shares in the depot", additionalInfo: { ShareID: shareID, Amount: amount } });
+          } else {
+            resolve({ success: false, message: "Not enough shares in the depot", additionalInfo: { SharedID: shareID, DepotAmount: depotShare.count, SellAmount: amount } });
+          }
         }
       } else {
         resolve(allOwnedSharesResult);
