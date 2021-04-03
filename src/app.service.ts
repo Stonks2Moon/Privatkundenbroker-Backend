@@ -920,6 +920,7 @@ export class AppService {
         } else {
           var gesamtwert = 0;
           for (var i = 0; i < results.length; i++) {
+            results[i].Position = i+1;
             gesamtwert += results[i].Wert;
           }
           resolve({ success: true, message: "List of Invoice positions obtained", data: results, additionalInfo: { gesamtwert: gesamtwert } });
