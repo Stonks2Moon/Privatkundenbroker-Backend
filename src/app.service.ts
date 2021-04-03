@@ -642,7 +642,7 @@ export class AppService {
   createOrderInDatabase(depotID: number, transactionID: number, boerseJobRefID: number, orderStatusID: number, shareRefID: string, orderTypID: number, amount: number, orderAuftragTypID: number, limit:number, stop: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("INSERT INTO `Order` (`OrderID`, `DepotID`, `TransaktionsID`, `BoerseJobRefID`, `OrderstatusID`, `ShareRefID`, `OrdertypID`, `Anzahl`, `OrderAuftragTypID`, `Limit`, `Stop`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ? ?, ?, ? )", [depotID, transactionID, boerseJobRefID, orderStatusID, shareRefID, orderTypID, amount, orderAuftragTypID, limit, stop], function (error, results, fields) {
+      connection.query("INSERT INTO `Order` (`OrderID`, `DepotID`, `TransaktionsID`, `BoerseJobRefID`, `OrderstatusID`, `ShareRefID`, `OrdertypID`, `Anzahl`, `OrderAuftragTypID`, `Limit`, `Stop`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )", [depotID, transactionID, boerseJobRefID, orderStatusID, shareRefID, orderTypID, amount, orderAuftragTypID, limit, stop], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
