@@ -609,7 +609,11 @@ export class AppController {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getInvoicesQueryProperties.email, getInvoicesQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
 
-        var checkIfMarketIsOpenResult = await this.appService.getInvoices(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        if(getInvoicesQueryProperties.invoiceID === undefined) {
+          var checkIfMarketIsOpenResult = await this.appService.getInvoices(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        } else {
+          var checkIfMarketIsOpenResult = await this.appService.getInvoice(loginWithPasswordHashResult.additionalInfo.NutzerID, getInvoicesQueryProperties.invoiceID);
+        }
         resolve(checkIfMarketIsOpenResult);
 
       } else {

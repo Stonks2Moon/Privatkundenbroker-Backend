@@ -491,6 +491,12 @@ export class getInvoicesQueryProperties {
         default: "sha1$3b9a1b28$1$d76673636ae2ae3d707b2ac0666473fd59f31418"
     })
     hashedPassword: string;
+
+    @ApiProperty({
+        description: "Rechnungsnummer",
+        required: false
+    })
+    invoiceID: number;
 }
 
 export class webhookOnPlaceQueryProperties {

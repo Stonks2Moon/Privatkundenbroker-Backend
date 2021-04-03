@@ -514,6 +514,26 @@ export class AppService {
     }.bind(this));
   }
 
+  getInvoice(nutzerID: number, invoiceID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query('SELECT * FROM `Rechnung` WHERE `NutzerID` = ? AND `RechnungsID` = ?', [nutzerID, invoiceID], async function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          for (var i = 0; i < results.length; i++) {
+            var rechnungPositionen = await this._getRechnungspositionen(results[i].RechnungsID)
+            results[i].gesamtWert = rechnungPositionen.additionalInfo.gesamtwert;
+            results[i].positionen = rechnungPositionen.data;
+          }
+          resolve({ success: true, message: "List of Invoices obtained", data: results });
+        }
+      }.bind(this));
+      connection.end();
+    }.bind(this));
+  }
+
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
       setTimeout(async function () {
