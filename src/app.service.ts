@@ -463,6 +463,21 @@ export class AppService {
     }
   }
 
+  getRechnungen(nutzerID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query('SELECT ISIN, AVG(Kaufpreis) AS avgKaufpreis, SUM(Kaufpreis) AS totalKaufpreis, Blockiert, COUNT(*) AS count FROM `Wertpapier` NATURAL JOIN Depot WHERE DepotID = ? AND NutzerID = ? GROUP BY ISIN, Blockiert', [depotID, nutzerID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Owned Wertpapiere have been obtained", data: results });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
   webhookOnPlace(body) {
     return new Promise<callResult>(async function (resolve, reject) {
       setTimeout(async function () {
@@ -510,7 +525,7 @@ export class AppService {
           console.log(updateTransaktionsBetragResult);
 
           // Create Rechnung
-          var createRechnungResult = await this._createRechnung(1, "Wertpapierverkauf Abrechnung");
+          var createRechnungResult = await this._createRechnung(getOrderByBoerseOrderRefIDResult.data.NutzerID, 1, "Wertpapierverkauf Abrechnung");
           var createRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, getOrderByBoerseOrderRefIDResult.data.Anzahl, "Wertpapier: " + getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl);
           var createFeeRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, 2, "Transaktionsgebühr", -10);
 
@@ -522,7 +537,7 @@ export class AppService {
           console.log(updateTransaktionsBetragResult);
 
           // Create Rechnung
-          var createRechnungResult = await this._createRechnung(1, "Wertpapierkauf Abrechnung");
+          var createRechnungResult = await this._createRechnung(getOrderByBoerseOrderRefIDResult.data.NutzerID, 1, "Wertpapierkauf Abrechnung");
           var createRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, getOrderByBoerseOrderRefIDResult.data.Anzahl, "Wertpapier: " + getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl);
           var createFeeRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, 1, "Transaktionsgebühr", 10);
         }
@@ -766,7 +781,7 @@ export class AppService {
   _getOrderByBoerseOrderRefID(boerseOrderRefID: string) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("SELECT * FROM `Order` WHERE BoerseOrderRefID = ?", [boerseOrderRefID], function (error, results, fields) {
+      connection.query("SELECT * FROM `Order` JOIN `Depot` ON `Order`.`DepotID` = `Depot`.`DepotID` WHERE BoerseOrderRefID = ?", [boerseOrderRefID], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
@@ -798,10 +813,10 @@ export class AppService {
     }.bind(this));
   }
 
-  _createRechnung(rechnungstypID: number, title: string) {
+  _createRechnung(nutzerID: number, rechnungstypID: number, title: string) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("INSERT INTO Rechnung (RechnungstypID, Titel) VALUES (?, ?)", [rechnungstypID, title], function (error, results, fields) {
+      connection.query("INSERT INTO Rechnung (NutzerID, RechnungstypID, Titel) VALUES (?, ?, ?)", [nutzerID, rechnungstypID, title], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });

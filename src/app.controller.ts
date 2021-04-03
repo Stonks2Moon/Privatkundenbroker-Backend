@@ -4,7 +4,8 @@ import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWit
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties, initiateAuszahlungQueryProperties,
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
-  webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, webhookTestProperties } from './app.apiproperties';
+  getRechungenQueryProperties, webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, 
+  webhookTestProperties } from './app.apiproperties';
 
 const config = require('../config.json')
 
@@ -546,6 +547,21 @@ export class AppController {
       if (loginWithPasswordHashResult.success) {
 
         var checkIfMarketIsOpenResult = await this.appService.checkIfMarketIsOpen();
+        resolve(checkIfMarketIsOpenResult);
+
+      } else {
+        resolve(loginWithPasswordHashResult);
+      }
+    }.bind(this));
+  }
+
+  @Get("/getRechnungen")
+  async getRechnungen(@Query() checkIfMarketIsOpengetRechungenQueryProperties: getRechungenQueryProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getRechungenQueryProperties.email, getRechungenQueryProperties.hashedPassword);
+      if (loginWithPasswordHashResult.success) {
+
+        var checkIfMarketIsOpenResult = await this.appService.getRechnungen(loginWithPasswordHashResult.additionalInfo.NutzerID);
         resolve(checkIfMarketIsOpenResult);
 
       } else {
