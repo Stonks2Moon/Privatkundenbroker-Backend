@@ -431,9 +431,9 @@ export class AppService {
       if (allOwnedSharesResult.success) {
         var depotShare = allOwnedSharesResult.data.filter(x => x.Blockiert === 0).find(x => x.ISIN === shareID);
 
-        if(depotShare === undefined){
+        if (depotShare === undefined) {
           resolve({ success: false, message: "Not enough shares in the depot", additionalInfo: { SharedID: shareID, DepotAmount: 0, SellAmount: amount } });
-        }else{
+        } else {
           if (amount <= depotShare.count) {
             resolve({ success: true, message: "Enough shares in the depot", additionalInfo: { ShareID: shareID, Amount: amount } });
           } else {
@@ -463,17 +463,22 @@ export class AppService {
     }
   }
 
-  getRechnungen(nutzerID: number) {
+  getInvoices(nutzerID: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query('SELECT ISIN, AVG(Kaufpreis) AS avgKaufpreis, SUM(Kaufpreis) AS totalKaufpreis, Blockiert, COUNT(*) AS count FROM `Wertpapier` NATURAL JOIN Depot WHERE DepotID = ? AND NutzerID = ? GROUP BY ISIN, Blockiert', [nutzerID], function (error, results, fields) {
+      connection.query('SELECT * FROM `Rechnung` WHERE `NutzerID` = ? ORDER BY `Rechnung`.`Datum` DESC', [nutzerID], async function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Owned Wertpapiere have been obtained", data: results });
+          for (var i = 0; i < results.length; i++) {
+            var rechnungPositionen = await this._getRechnungspositionen(results[i].RechnungsID)
+            results[i].gesamtWert = rechnungPositionen.additionalInfo.gesamtwert;
+            results[i].positionen = rechnungPositionen.data;
+          }
+          resolve({ success: true, message: "List of Invoices obtained", data: results });
         }
-      });
+      }.bind(this));
       connection.end();
     }.bind(this));
   }
@@ -533,7 +538,7 @@ export class AppService {
           var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
           console.log(addSharesToDepotResult);
 
-          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * ( getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl ) - config.transactionFee)
+          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * (getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl) - config.transactionFee)
           console.log(updateTransaktionsBetragResult);
 
           // Create Rechnung
@@ -561,32 +566,6 @@ export class AppService {
     }.bind(this));
   }
 
-  _getTimestampOfLastNight() {
-    var now = new Date;
-    now.setHours(0);
-    now.setMinutes(0);
-    now.setSeconds(0);
-    var timestampOfLastNight = Math.floor(Number(now) / 1000) * 1000 - 1;
-    return timestampOfLastNight;
-  }
-
-  _getDepotIDsOfUser(userID: number) {
-    return new Promise(async function (resolve, reject) {
-      var connection = mysql.createConnection(config.database);
-      connection.query('SELECT * FROM `Depot` WHERE NutzerID = ?', [userID], function (error, results, fields) {
-        if (error) {
-          resolve([]);
-        } else {
-          var depotIDs = [];
-          for (var i = 0; i < results.length; i++) {
-            depotIDs.push(results[i].DepotID)
-          }
-          resolve(depotIDs);
-        }
-      });
-      connection.end();
-    }.bind(this));
-  }
 
   createOrderInDatabase(depotID: number, transactionID: number, boerseJobRefID: number, orderStatusID: number, shareRefID: string, orderTypID: number, amount: number) {
     return new Promise<callResult>(async function (resolve, reject) {
@@ -621,6 +600,33 @@ export class AppService {
         resolve(getSharesInDepotForSpecificBlockedStatusResult);
       }
     }.bind(this))
+  }
+
+  _getTimestampOfLastNight() {
+    var now = new Date;
+    now.setHours(0);
+    now.setMinutes(0);
+    now.setSeconds(0);
+    var timestampOfLastNight = Math.floor(Number(now) / 1000) * 1000 - 1;
+    return timestampOfLastNight;
+  }
+
+  _getDepotIDsOfUser(userID: number) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query('SELECT * FROM `Depot` WHERE NutzerID = ?', [userID], function (error, results, fields) {
+        if (error) {
+          resolve([]);
+        } else {
+          var depotIDs = [];
+          for (var i = 0; i < results.length; i++) {
+            depotIDs.push(results[i].DepotID)
+          }
+          resolve(depotIDs);
+        }
+      });
+      connection.end();
+    }.bind(this));
   }
 
   _setBlockedStatusForOnShare(wertpapierID: number, blocked: number) {
@@ -822,6 +828,25 @@ export class AppService {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
           resolve({ success: true, message: "Rechnung has been created", additionalInfo: { RechnungsID: results.insertId } });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
+  _getRechnungspositionen(rechnungsID: number) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query('SELECT * FROM `Rechnungsposition` WHERE `RechnungsID` = ?', [rechnungsID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          var gesamtwert = 0;
+          for (var i = 0; i < results.length; i++) {
+            gesamtwert += results[i].Wert;
+          }
+          resolve({ success: true, message: "List of Invoice positions obtained", data: results, additionalInfo: { gesamtwert: gesamtwert } });
         }
       });
       connection.end();

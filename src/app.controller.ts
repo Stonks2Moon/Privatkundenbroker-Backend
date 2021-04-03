@@ -4,7 +4,7 @@ import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWit
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties, initiateAuszahlungQueryProperties,
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
-  getRechungenQueryProperties, webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, 
+  getInvoicesQueryProperties, webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, 
   webhookTestProperties } from './app.apiproperties';
 
 const config = require('../config.json')
@@ -555,13 +555,13 @@ export class AppController {
     }.bind(this));
   }
 
-  @Get("/getRechnungen")
-  async getRechnungen(@Query() getRechungenQueryProperties: getRechungenQueryProperties): Promise<string> {
+  @Get("/getInvoices")
+  async getInvoices(@Query() getInvoicesQueryProperties: getInvoicesQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
-      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getRechungenQueryProperties.email, getRechungenQueryProperties.hashedPassword);
+      var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(getInvoicesQueryProperties.email, getInvoicesQueryProperties.hashedPassword);
       if (loginWithPasswordHashResult.success) {
 
-        var checkIfMarketIsOpenResult = await this.appService.getRechnungen(loginWithPasswordHashResult.additionalInfo.NutzerID);
+        var checkIfMarketIsOpenResult = await this.appService.getInvoices(loginWithPasswordHashResult.additionalInfo.NutzerID);
         resolve(checkIfMarketIsOpenResult);
 
       } else {

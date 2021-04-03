@@ -431,7 +431,7 @@ export class checkIfMarketIsOpenQueryProperties {
     hashedPassword: string;
 }
 
-export class getRechungenQueryProperties {
+export class getInvoicesQueryProperties {
     @ApiProperty({
         description: "EMail",
         default: "test@tjbn.de"
