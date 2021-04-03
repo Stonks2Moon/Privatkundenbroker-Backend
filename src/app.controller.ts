@@ -117,7 +117,7 @@ export class AppController {
         
         var getLastTransactionsOfVerrechnungskontoResult = await this.appService.getLastTransactionsOfVerrechnungskonto(loginWithPasswordHashResult.additionalInfo.NutzerID);
 
-        var getBalanceAndLastTransactionsOfVerrechnungskontoResult = {success: true, message: "Balance and Last TransactionRetrieved", data: { balance: getBalanceOfVerrechnungskontoResult.data.Guthaben, transactions: getLastTransactionsOfVerrechnungskontoResult.data }}
+        var getBalanceAndLastTransactionsOfVerrechnungskontoResult = {success: true, message: "Balance and Last Transactions Retrieved", data: { balance: getBalanceOfVerrechnungskontoResult.data.Guthaben, transactions: getLastTransactionsOfVerrechnungskontoResult.data }}
         
         resolve(JSON.stringify(getBalanceAndLastTransactionsOfVerrechnungskontoResult));
       } else {
