@@ -4,7 +4,7 @@ import { registerUserQueryProperties, loginWithPasswordQueryProperties, loginWit
   updateAdressDataQueryProperties, updatePasswordOfUserQueryProperties, getBalanceAndLastTransactionsOfVerrechnungskontoQueryProperties, 
   createTransactionAsAdminQueryProperties, getAllSharesQueryProperties, getShareQueryProperties, getPriceOfShareQueryProperties, initiateAuszahlungQueryProperties,
   getPriceDevlopmentOfShareQueryProperties, getDepotValuesQueryProperties, buyOrderQueryProperties, sellOrderQueryProperties, checkIfMarketIsOpenQueryProperties,
-  webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties } from './app.apiproperties';
+  webhookOnPlaceQueryProperties, webhookOnMatchQueryProperties, webhookOnCompleteQueryProperties, webhookOnDeleteQueryProperties, webhookTestProperties } from './app.apiproperties';
 
 @Controller()
 export class AppController {
@@ -412,25 +412,105 @@ export class AppController {
                 case "Market": {
                   //Place the order
                   var sellMarketOrderResult = await this.appService.sellMarketOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount);
-                   resolve(sellMarketOrderResult);
+                    if(sellMarketOrderResult.success){
+                      //Set blocked status for shares
+                      var setBlockedStatusForSharesResult = await this.appService.setBlockedStatusForShares(sellOrderQueryProperties.depotID, sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, 1)
+                     
+                      if(setBlockedStatusForSharesResult.success){
+                        //Execute the transaction on the database
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        
+                        if(createTransactionResult.success){
+                          //Create an order in the database
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellMarketOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          resolve(createOrderInDatabaseResult);
+                        }else{
+                          resolve(createTransactionResult);
+                        }
+                      }else{
+                        resolve(setBlockedStatusForSharesResult);
+                      }
+                    }else{
+                      resolve(sellMarketOrderResult);
+                    }                 
                   break; 
                 } 
                 case "Stop Market": { 
                   //Place the order
                   var sellStopMarketOrderResult = await this.appService.sellStopMarketOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, sellOrderQueryProperties.stop);
-                  resolve(sellStopMarketOrderResult);
-                  break; 
+                    if(sellStopMarketOrderResult.success){
+                      //Set blocked status for shares
+                      var setBlockedStatusForSharesResult = await this.appService.setBlockedStatusForShares(sellOrderQueryProperties.depotID, sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, 1)
+                      
+                      if(setBlockedStatusForSharesResult.success){
+                        //Execute the transaction on the database
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        
+                        if(createTransactionResult.success){
+                          //Create an order in the database
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellStopMarketOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          resolve(createOrderInDatabaseResult);
+                        }else{
+                          resolve(createTransactionResult);
+                        }
+                      }else{
+                        resolve(setBlockedStatusForSharesResult);
+                      }
+                    }else{
+                      resolve(sellStopMarketOrderResult);
+                    }                 
+                  break;                   
                 } 
                 case "Limit": { 
                   //Place the order
                   var sellLimitOrderResult = await this.appService.sellLimitOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, sellOrderQueryProperties.limit);
-                  resolve(sellLimitOrderResult);            
-                  break; 
+                    if(sellLimitOrderResult.success){                                       
+                      //Set blocked status for shares
+                      var setBlockedStatusForSharesResult = await this.appService.setBlockedStatusForShares(sellOrderQueryProperties.depotID, sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, 1)
+                      
+                      if(setBlockedStatusForSharesResult.success){
+                        //Execute the transaction on the database
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        
+                        if(createTransactionResult.success){
+                          //Create an order in the database
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellLimitOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          resolve(createOrderInDatabaseResult);
+                        }else{
+                          resolve(createTransactionResult);
+                        }
+                      }else{
+                        resolve(setBlockedStatusForSharesResult);
+                      }
+                    }else{
+                      resolve(sellLimitOrderResult);
+                    }                 
+                  break;                        
                 } 
                 case "Stop Limit": { 
                   //Place the order
                   var sellStopLimitOrderResult = await this.appService.sellStopLimitOrder(sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, sellOrderQueryProperties.limit, sellOrderQueryProperties.limit);
-                  resolve(sellStopLimitOrderResult);   
+                    if(sellStopLimitOrderResult.success){
+                      //Set blocked status for shares
+                      var setBlockedStatusForSharesResult = await this.appService.setBlockedStatusForShares(sellOrderQueryProperties.depotID, sellOrderQueryProperties.shareID, sellOrderQueryProperties.amount, 1)
+                      
+                      if(setBlockedStatusForSharesResult.success){
+                        //Execute the transaction on the database
+                        var createTransactionResult = await this.appService.createTransactionAsAdmin(loginWithPasswordHashResult.additionalInfo.NutzerID, "Aktienverkauf: " +  sellOrderQueryProperties.shareID, 0, "TODO")
+                        
+                        if(createTransactionResult.success){
+                          //Create an order in the database
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellStopLimitOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          resolve(createOrderInDatabaseResult);
+                        }else{
+                          resolve(createTransactionResult);
+                        }
+                      }else{
+                        resolve(setBlockedStatusForSharesResult);
+                      }
+                    }else{
+                      resolve(sellStopLimitOrderResult);
+                    }                     
                   break; 
                 } 
                 default: { 
@@ -516,6 +596,16 @@ export class AppController {
       } else {
         resolve({success: false, message: "Wrong webhookAuthToken"});
       }
+    }.bind(this));
+  }
+
+  @Get("/webhook/TEST")
+  async testWebhook(@Query() webhookTestProperties: webhookTestProperties): Promise<string> {
+    return new Promise<string>(async function (resolve, reject) {
+
+        var _testWebhook = await this.appService._testWebhook(webhookTestProperties.boerseOrderID);
+        resolve(JSON.stringify(_testWebhook));
+
     }.bind(this));
   }
 }

@@ -458,3 +458,11 @@ export class webhookOnDeleteQueryProperties {
     })
     webhookAuthToken: string;
 }
+
+export class webhookTestProperties {
+    @ApiProperty({
+        description: "BörseOrderID",
+        default: "60661e3dd25a3472ebad980d"
+    })
+    boerseOrderID: string;
+}

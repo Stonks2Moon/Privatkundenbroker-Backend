@@ -238,7 +238,7 @@ export class AppService {
   getAllOwnedWertpapiereFromDatabase(nutzerID: number, depotID: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query('SELECT ISIN, AVG(Kaufpreis) AS avgKaufpreis, SUM(Kaufpreis) AS totalKaufpreis, COUNT(*) AS count FROM `Wertpapier` NATURAL JOIN Depot WHERE DepotID = ? AND NutzerID = ? GROUP BY ISIN', [depotID, nutzerID], function (error, results, fields) {
+      connection.query('SELECT ISIN, AVG(Kaufpreis) AS avgKaufpreis, SUM(Kaufpreis) AS totalKaufpreis, Blockiert, COUNT(*) AS count FROM `Wertpapier` NATURAL JOIN Depot WHERE DepotID = ? AND NutzerID = ? GROUP BY ISIN, Blockiert', [depotID, nutzerID], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
@@ -429,7 +429,7 @@ export class AppService {
       var allOwnedSharesResult: callResult = await this.getAllOwnedWertpapiereFromDatabase(nutzerID, depotID);
 
       if (allOwnedSharesResult.success) {
-        var depotShare = allOwnedSharesResult.data.find(x => x.ISIN === shareID);
+        var depotShare = allOwnedSharesResult.data.filter(x => x.Blockiert === 0).find(x => x.ISIN === shareID);
 
         if (amount <= depotShare.count) {
           resolve({ success: true, message: "Enough shares in the depot", additionalInfo: { ShareID: shareID, Amount: amount } });
@@ -492,16 +492,27 @@ export class AppService {
         var updateOrderStatusResult = await this._updateOrderStatusID(3, body.orderId);
         console.log(updateOrderStatusResult);
 
-        // TODO: Wertpapiere anlegen, Transaktionskorrektur
-
         var getOrderByBoerseOrderRefIDResult = await this._getOrderByBoerseOrderRefID(body.orderId);
         console.log(getOrderByBoerseOrderRefIDResult);
         console.log(getOrderByBoerseOrderRefIDResult.data.Anzahl);
-        var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
-        console.log(addSharesToDepotResult);
 
-        var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
-        console.log(updateTransaktionsBetragResult);
+
+        if(getOrderByBoerseOrderRefIDResult.data.OrdertypID === 1){ //SELL
+        
+          var removeSharesFromDepotResult = await this._removeSharesFromDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl,getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID);
+          console.log(removeSharesFromDepotResult);
+
+          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
+          console.log(updateTransaktionsBetragResult);
+
+        }else { //BUY
+          var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
+          console.log(addSharesToDepotResult);
+
+          var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
+          console.log(updateTransaktionsBetragResult);
+         
+        }
 
         resolve({ success: true, message: "Success" });
       }.bind(this), 4000);
@@ -564,6 +575,59 @@ export class AppService {
     }.bind(this))
   }
 
+  setBlockedStatusForShares(depotID: number, shareID: string, amount: number, blocked:number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      var getSharesInDepotForSpecificBlockedStatusResult = await this._getSharesInDepotForSpecificBlockedStatus(depotID, shareID, 1-blocked)
+
+      if(getSharesInDepotForSpecificBlockedStatusResult.success){
+        for(var i = 0; i < amount; i++){
+          var wertpapierID = getSharesInDepotForSpecificBlockedStatusResult.data[i].WertpapierID;
+          var setBlockedStatusForOnShareResult = await  this._setBlockedStatusForOnShare(wertpapierID, blocked);
+          if (!setBlockedStatusForOnShareResult.success) {
+              resolve(setBlockedStatusForOnShareResult)
+            }
+          }
+      }else{
+        resolve(getSharesInDepotForSpecificBlockedStatusResult);
+      }
+    }.bind(this))
+  }
+
+  _setBlockedStatusForOnShare(wertpapierID: number, blocked: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("UPDATE `Wertpapier` SET `Blockiert` = ? WHERE `Wertpapier`.`WertpapierID` = ?", [blocked,  wertpapierID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "The blocked status of the share has been updated", additionalInfo: {WertpapierID: wertpapierID, Blockiert: blocked} });
+        }
+      });
+      connection.end();
+    }.bind(this))
+  }
+
+  _getSharesInDepotForSpecificBlockedStatus(depotID: number, shareID: string, blocked: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("SELECT * FROM `Wertpapier` WHERE DepotID = ? And ISIN = ? AND Blockiert = ?", [depotID,  shareID, blocked], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          if(results.length > 0){
+            resolve({ success: true, message: "Shares in Depot for specific blocked status have been received", data: results });
+          }else {
+            resolve({ success: false, message: "The are no shares for this blocked status in the depot or all shares have this blocked status already."});
+          }
+        }
+      });
+      connection.end();
+    }.bind(this))
+  }
+
   _updateAusfuehrungspreisInDatabase(boerseOrderRefID: string, ausfuehrungspreis: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
@@ -602,7 +666,7 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Transaktionsbetrag has been updated" });
+          resolve({ success: true, message: "Transaction value has been updated" });
         }
       });
       connection.end();
@@ -651,6 +715,40 @@ export class AppService {
     }.bind(this));
   }
 
+  _removeSharesFromDepot(amount: number, shareID: string, depotID: number) {
+    return new Promise<callResult>(async function (resolve, reject) {
+      var getBlockedWertpapiereResult = await this._getSharesInDepotForSpecificBlockedStatus(depotID, shareID, 1);
+
+      if(getBlockedWertpapiereResult.success){
+        for (var i = 0; i < amount; i++) {
+          var wertpapierID = getBlockedWertpapiereResult.data[i].WertpapierID;
+          var removeOneShareFromDepotResult = await  this._removeOneShareFromDepot(wertpapierID);
+          if (!removeOneShareFromDepotResult.success) {
+            resolve(removeOneShareFromDepotResult)
+          }
+        }
+        resolve(removeOneShareFromDepotResult)
+      }else{
+        resolve(getBlockedWertpapiereResult)
+      }
+    }.bind(this))
+  }
+
+  _removeOneShareFromDepot(wertpapierID: number) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("DELETE FROM `Wertpapier` WHERE `Wertpapier`.`WertpapierID` = ?", [wertpapierID], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Share has been removed from depot", additionalInfo: results[0] });
+        }
+      });
+      connection.end();
+    }.bind(this));
+  }
+
   _getOrderByBoerseOrderRefID(boerseOrderRefID: string) {
     return new Promise(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
@@ -663,6 +761,26 @@ export class AppService {
         }
       });
       connection.end();
+    }.bind(this));
+  }
+
+  _testWebhook(boerseOrderRefID: string){
+    return new Promise(async function (resolve, reject) {
+      var getOrderResult = await this._getOrderByBoerseOrderRefID(boerseOrderRefID);
+      var shares = await this._getSharesInDepotForSpecificBlockedStatus(10, "testISIN", 1)
+
+      console.log(shares)
+
+      var check = await this.checkIfDepotHasEnoughShares(3, "testISIN", 23, 10)
+
+      console.log(check);
+
+      if(getOrderResult.data.OrdertypID === 1){ //SELL
+        resolve({ success: true, message: "SELL" });
+      }else {
+        resolve({ success: true, message: "BUY" }); //BUY
+      }
+
     }.bind(this));
   }
 
