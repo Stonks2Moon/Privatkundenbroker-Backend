@@ -210,7 +210,7 @@ export class AppService {
   getLastTransactionsOfVerrechnungskonto(nutzerID: number): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("SELECT * FROM `Transaktion` LEFT JOIN `Order` ON Transaktion.TransaktionsID = `Order`.`TransaktionsID` WHERE `NutzerID` = ? ORDER BY `Transaktion`.`Datum` DESC", [nutzerID], function (error, results, fields) {
+      connection.query("SELECT * FROM `Transaktion` LEFT JOIN `Order` ON Transaktion.TransaktionsID = `Order`.`TransaktionsID` WHERE `NutzerID` = ? ORDER BY `Transaktion`.`TransaktionsID` DESC", [nutzerID], function (error, results, fields) {
         if (error) {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         };
