@@ -588,6 +588,7 @@ export class AppService {
               resolve(setBlockedStatusForOnShareResult)
             }
           }
+          resolve(setBlockedStatusForOnShareResult)
       }else{
         resolve(getSharesInDepotForSpecificBlockedStatusResult);
       }

@@ -422,7 +422,7 @@ export class AppController {
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
-                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellMarketOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellMarketOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 1, sellOrderQueryProperties.amount)
                           resolve(createOrderInDatabaseResult);
                         }else{
                           resolve(createTransactionResult);
@@ -448,7 +448,7 @@ export class AppController {
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
-                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellStopMarketOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellStopMarketOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 1, sellOrderQueryProperties.amount)
                           resolve(createOrderInDatabaseResult);
                         }else{
                           resolve(createTransactionResult);
@@ -474,7 +474,7 @@ export class AppController {
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
-                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellLimitOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellLimitOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 1, sellOrderQueryProperties.amount)
                           resolve(createOrderInDatabaseResult);
                         }else{
                           resolve(createTransactionResult);
@@ -500,7 +500,7 @@ export class AppController {
                         
                         if(createTransactionResult.success){
                           //Create an order in the database
-                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellStopLimitOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 2, sellOrderQueryProperties.amount)
+                          var createOrderInDatabaseResult = await this.appService.createOrderInDatabase(sellOrderQueryProperties.depotID, createTransactionResult.additionalInfo.insertId, sellStopLimitOrderResult.data.id, 1, sellOrderQueryProperties.shareID, 1, sellOrderQueryProperties.amount)
                           resolve(createOrderInDatabaseResult);
                         }else{
                           resolve(createTransactionResult);
