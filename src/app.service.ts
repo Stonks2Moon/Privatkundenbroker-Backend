@@ -743,7 +743,7 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Share has been removed from depot", additionalInfo: results[0] });
+          resolve({ success: true, message: "Share has been removed from depot", additionalInfo: results });
         }
       });
       connection.end();
