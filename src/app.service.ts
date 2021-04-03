@@ -467,7 +467,7 @@ export class AppService {
   getOrders(depotID: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("SELECT `Order`.* FROM `Order` JOIN Orderstatus ON `Order`.`OrderstatusID` = Orderstatus.OrderstatusID WHERE DepotID = ?", [depotID], function (error, results, fields) {
+      connection.query("SELECT `Order`.*, Orderstatus.Beschreibung AS OrderstatusBeschreibung, Ordertyp.Beschreibung AS OrdertypBeschreibung FROM `Order` JOIN Orderstatus ON `Order`.`OrderstatusID` = Orderstatus.OrderstatusID JOIN Ordertyp ON `Order`.`OrdertypID` = Ordertyp.OrdertypID WHERE DepotID = ?", [depotID], function (error, results, fields) {
         if (error) {
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
