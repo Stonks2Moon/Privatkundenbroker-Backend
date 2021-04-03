@@ -581,7 +581,7 @@ export class AppService {
           console.log(updateTransaktionsBetragResult);
 
           // Create Rechnung
-          var createRechnungResult = await this._createRechnung(getOrderByBoerseOrderRefIDResult.data.NutzerID, 1, "Wertpapierverkauf Abrechnung");
+          var createRechnungResult = await this._createRechnung(getOrderByBoerseOrderRefIDResult.data.NutzerID, 2, "Wertpapierverkauf Abrechnung");
           var createRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, getOrderByBoerseOrderRefIDResult.data.Anzahl, "Wertpapier: " + getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl);
           var createFeeRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, 2, "Transaktionsgebühr", -10);
 
