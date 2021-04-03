@@ -497,21 +497,21 @@ export class AppService {
         console.log(getOrderByBoerseOrderRefIDResult.data.Anzahl);
 
 
-        if(getOrderByBoerseOrderRefIDResult.data.OrdertypID === 1){ //SELL
-        
-          var removeSharesFromDepotResult = await this._removeSharesFromDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl,getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID);
+        if (getOrderByBoerseOrderRefIDResult.data.OrdertypID === 1) { //SELL
+
+          var removeSharesFromDepotResult = await this._removeSharesFromDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID);
           console.log(removeSharesFromDepotResult);
 
           var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
           console.log(updateTransaktionsBetragResult);
 
-        }else { //BUY
+        } else { //BUY
           var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
           console.log(addSharesToDepotResult);
 
           var updateTransaktionsBetragResult = await this._updateTransaktionsBetrag(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, (-1) * getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl)
           console.log(updateTransaktionsBetragResult);
-         
+
         }
 
         resolve({ success: true, message: "Success" });
@@ -575,21 +575,21 @@ export class AppService {
     }.bind(this))
   }
 
-  setBlockedStatusForShares(depotID: number, shareID: string, amount: number, blocked:number) {
+  setBlockedStatusForShares(depotID: number, shareID: string, amount: number, blocked: number) {
     return new Promise<callResult>(async function (resolve, reject) {
 
-      var getSharesInDepotForSpecificBlockedStatusResult = await this._getSharesInDepotForSpecificBlockedStatus(depotID, shareID, 1-blocked)
+      var getSharesInDepotForSpecificBlockedStatusResult = await this._getSharesInDepotForSpecificBlockedStatus(depotID, shareID, 1 - blocked)
 
-      if(getSharesInDepotForSpecificBlockedStatusResult.success){
-        for(var i = 0; i < amount; i++){
+      if (getSharesInDepotForSpecificBlockedStatusResult.success) {
+        for (var i = 0; i < amount; i++) {
           var wertpapierID = getSharesInDepotForSpecificBlockedStatusResult.data[i].WertpapierID;
-          var setBlockedStatusForOnShareResult = await  this._setBlockedStatusForOnShare(wertpapierID, blocked);
+          var setBlockedStatusForOnShareResult = await this._setBlockedStatusForOnShare(wertpapierID, blocked);
           if (!setBlockedStatusForOnShareResult.success) {
-              resolve(setBlockedStatusForOnShareResult)
-            }
+            resolve(setBlockedStatusForOnShareResult)
           }
-          resolve(setBlockedStatusForOnShareResult)
-      }else{
+        }
+        resolve(setBlockedStatusForOnShareResult)
+      } else {
         resolve(getSharesInDepotForSpecificBlockedStatusResult);
       }
     }.bind(this))
@@ -598,12 +598,12 @@ export class AppService {
   _setBlockedStatusForOnShare(wertpapierID: number, blocked: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("UPDATE `Wertpapier` SET `Blockiert` = ? WHERE `Wertpapier`.`WertpapierID` = ?", [blocked,  wertpapierID], function (error, results, fields) {
+      connection.query("UPDATE `Wertpapier` SET `Blockiert` = ? WHERE `Wertpapier`.`WertpapierID` = ?", [blocked, wertpapierID], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "The blocked status of the share has been updated", additionalInfo: {WertpapierID: wertpapierID, Blockiert: blocked} });
+          resolve({ success: true, message: "The blocked status of the share has been updated", additionalInfo: { WertpapierID: wertpapierID, Blockiert: blocked } });
         }
       });
       connection.end();
@@ -613,15 +613,15 @@ export class AppService {
   _getSharesInDepotForSpecificBlockedStatus(depotID: number, shareID: string, blocked: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       var connection = mysql.createConnection(config.database);
-      connection.query("SELECT * FROM `Wertpapier` WHERE DepotID = ? And ISIN = ? AND Blockiert = ?", [depotID,  shareID, blocked], function (error, results, fields) {
+      connection.query("SELECT * FROM `Wertpapier` WHERE DepotID = ? And ISIN = ? AND Blockiert = ?", [depotID, shareID, blocked], function (error, results, fields) {
         if (error) {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          if(results.length > 0){
+          if (results.length > 0) {
             resolve({ success: true, message: "Shares in Depot for specific blocked status have been received", data: results });
-          }else {
-            resolve({ success: false, message: "The are no shares for this blocked status in the depot or all shares have this blocked status already."});
+          } else {
+            resolve({ success: false, message: "The are no shares for this blocked status in the depot or all shares have this blocked status already." });
           }
         }
       });
@@ -720,16 +720,16 @@ export class AppService {
     return new Promise<callResult>(async function (resolve, reject) {
       var getBlockedWertpapiereResult = await this._getSharesInDepotForSpecificBlockedStatus(depotID, shareID, 1);
 
-      if(getBlockedWertpapiereResult.success){
+      if (getBlockedWertpapiereResult.success) {
         for (var i = 0; i < amount; i++) {
           var wertpapierID = getBlockedWertpapiereResult.data[i].WertpapierID;
-          var removeOneShareFromDepotResult = await  this._removeOneShareFromDepot(wertpapierID);
+          var removeOneShareFromDepotResult = await this._removeOneShareFromDepot(wertpapierID);
           if (!removeOneShareFromDepotResult.success) {
             resolve(removeOneShareFromDepotResult)
           }
         }
         resolve(removeOneShareFromDepotResult)
-      }else{
+      } else {
         resolve(getBlockedWertpapiereResult)
       }
     }.bind(this))
@@ -743,7 +743,7 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Share has been removed from depot"});
+          resolve({ success: true, message: "Share has been removed from depot" });
         }
       });
       connection.end();
@@ -765,7 +765,7 @@ export class AppService {
     }.bind(this));
   }
 
-  _testWebhook(boerseOrderRefID: string){
+  _testWebhook(boerseOrderRefID: string) {
     return new Promise(async function (resolve, reject) {
       var getOrderResult = await this._getOrderByBoerseOrderRefID(boerseOrderRefID);
       var shares = await this._getSharesInDepotForSpecificBlockedStatus(10, "testISIN", 1)
@@ -776,12 +776,27 @@ export class AppService {
 
       console.log(check);
 
-      if(getOrderResult.data.OrdertypID === 1){ //SELL
+      if (getOrderResult.data.OrdertypID === 1) { //SELL
         resolve({ success: true, message: "SELL" });
-      }else {
+      } else {
         resolve({ success: true, message: "BUY" }); //BUY
       }
 
+    }.bind(this));
+  }
+
+  _createRechnung(title: string) {
+    return new Promise(async function (resolve, reject) {
+      var connection = mysql.createConnection(config.database);
+      connection.query("INSERT INTO Rechnung (Titel) VALUES (?)", [title], function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
+        } else {
+          resolve({ success: true, message: "Rechnung has been created", additionalInfo: results.insertId });
+        }
+      });
+      connection.end();
     }.bind(this));
   }
 
