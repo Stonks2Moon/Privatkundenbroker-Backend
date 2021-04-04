@@ -402,7 +402,7 @@ export class AppService {
   deleteOrder(boerseOrderRefID: string): Promise<callResult> {
     return new Promise<callResult>(async function (resolve, reject) {
 
-      await orderManager.getOrder(boerseOrderRefID)
+      await orderManager.deleteOrder(boerseOrderRefID)
         .then((res) => resolve({ success: true, message: "The order has been deleted successfully", data: res }))
         .catch((err) => resolve({ success: false, message: "Failed to delete the order", additionalInfo: err }));
     }.bind(this));
@@ -628,7 +628,7 @@ export class AppService {
 
         if (getOrderByBoerseOrderRefIDResult.data.OrdertypID === 1) { //SELL
           //Adjust share state from blocked to unblocked
-          var setBlockedStatusForSharesResult = await this.setBlockedStatusForShares(getOrderByBoerseOrderRefIDResult.data.depotID, getOrderByBoerseOrderRefIDResult.data.shareID, getOrderByBoerseOrderRefIDResult.data.amount, 0)
+          var setBlockedStatusForSharesResult = await this.setBlockedStatusForShares(getOrderByBoerseOrderRefIDResult.data.depotID, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.amount, 0)
           console.log(setBlockedStatusForSharesResult)
           
           var updateTransaktionDescriptionResult = await this._updateTransaktionDescription(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, "ABBRUCH: Aktienverkauf")
