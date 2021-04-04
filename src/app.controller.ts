@@ -540,7 +540,7 @@ export class AppController {
     }.bind(this));
   }
 
-  @Delete("/order")
+  @Delete("/deleteOrder")
   async deleteOrder(@Query() deleteOrderQueryProperties: deleteOrderQueryProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
       var loginWithPasswordHashResult = await this.appService.loginWithPasswordHash(deleteOrderQueryProperties.email, deleteOrderQueryProperties.hashedPassword);
@@ -549,10 +549,13 @@ export class AppController {
         //Check if market is open
         var marketIsOpenResult = await this.appService.checkIfMarketIsOpen();
         if(marketIsOpenResult.success){
-          var checkOrderStatusResult = await this.appService.checkOrderStatus(deleteOrderQueryProperties.depotID, deleteOrderQueryProperties.orderID, 1)
+          var checkOrderStatusResult = await this.appService.checkOrderStatus(Number(deleteOrderQueryProperties.depotID), Number(deleteOrderQueryProperties.orderID), 1)
           
           if(checkOrderStatusResult.success){
-            //Call an Börse zum Deleten der Order
+            //Delete Order
+
+            var deleteOrderResult = await this.appService.deleteOrder(checkOrderStatusResult.additionalInfo.BoerseOrderRefID)
+            resolve(deleteOrderResult)
           }else{
             resolve(checkOrderStatusResult)
           }

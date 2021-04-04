@@ -432,7 +432,7 @@ export class deleteOrderQueryProperties {
 
     @ApiProperty({
         description: "OrderID",
-        default: "110"
+        default: "146"
     })
     orderID: number;
 
