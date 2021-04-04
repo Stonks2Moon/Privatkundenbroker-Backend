@@ -628,7 +628,7 @@ export class AppService {
 
         if (getOrderByBoerseOrderRefIDResult.data.OrdertypID === 1) { //SELL
           //Adjust share state from blocked to unblocked
-          var setBlockedStatusForSharesResult = await this.setBlockedStatusForShares(getOrderByBoerseOrderRefIDResult.data.depotID, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.amount, 0)
+          var setBlockedStatusForSharesResult = await this.setBlockedStatusForShares(getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Anzahl, 0)
           console.log(setBlockedStatusForSharesResult)
           
           var updateTransaktionDescriptionResult = await this._updateTransaktionDescription(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, "ABBRUCH: Aktienverkauf")
