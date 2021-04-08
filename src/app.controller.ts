@@ -677,7 +677,7 @@ export class AppController {
     }.bind(this));
   }
 
-  @Get("/webhook/TEST")
+  /*@Get("/webhook/TEST")
   async testWebhook(@Query() webhookTestProperties: webhookTestProperties): Promise<string> {
     return new Promise<string>(async function (resolve, reject) {
 
@@ -685,7 +685,7 @@ export class AppController {
         resolve(JSON.stringify(_testWebhook));
 
     }.bind(this));
-  }
+  }*/
 }
 
 
