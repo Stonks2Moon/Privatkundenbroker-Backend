@@ -399,6 +399,15 @@ export class AppService {
     }.bind(this));
   }
 
+  deleteOrder(boerseOrderRefID: string): Promise<callResult> {
+    return new Promise<callResult>(async function (resolve, reject) {
+
+      await orderManager.deleteOrder(boerseOrderRefID)
+        .then((res) => resolve({ success: true, message: "The order has been deleted successfully", data: res }))
+        .catch((err) => resolve({ success: false, message: "Failed to delete the order", additionalInfo: err }));
+    }.bind(this));
+  }
+
   checkAmount(amount: number) {
     return new Promise<callResult>(async function (resolve, reject) {
       if (Number(amount) <= config.maxOrderAmount) {
@@ -451,10 +460,12 @@ export class AppService {
     return new Promise<callResult>(async function (resolve, reject) {
 
       var getOrdersResult = await this.getOrders(depotID);
+
       if (getOrdersResult.success) {
         var order = getOrdersResult.data.find(x => x.OrderID === orderID)
+
         if (orderStatusID === order.OrderstatusID) {
-          resolve({ success: true, message: "Order status matches"});
+          resolve({ success: true, message: "Order status matches", additionalInfo: order});
         } else {
           resolve({ success: false, message: "Order status doesn't match" });
         }
@@ -617,7 +628,7 @@ export class AppService {
 
         if (getOrderByBoerseOrderRefIDResult.data.OrdertypID === 1) { //SELL
           //Adjust share state from blocked to unblocked
-          var setBlockedStatusForSharesResult = await this.setBlockedStatusForShares(getOrderByBoerseOrderRefIDResult.data.depotID, getOrderByBoerseOrderRefIDResult.data.shareID, getOrderByBoerseOrderRefIDResult.data.amount, 0)
+          var setBlockedStatusForSharesResult = await this.setBlockedStatusForShares(getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Anzahl, 0)
           console.log(setBlockedStatusForSharesResult)
           
           var updateTransaktionDescriptionResult = await this._updateTransaktionDescription(getOrderByBoerseOrderRefIDResult.data.TransaktionsID, "ABBRUCH: Aktienverkauf")
@@ -888,9 +899,9 @@ export class AppService {
 
   _testWebhook(boerseOrderRefID: string) {
     return new Promise(async function (resolve, reject) {
-      var updateTransaktionDescriptionResult = await this._updateTransaktionDescription(217, "ABBRUCH: Aktienkauf")
 
-      resolve(updateTransaktionDescriptionResult);
+      var getOrdersResult = await this.checkOrderStatus(9, 146, 1)
+      resolve(getOrdersResult)
 
     }.bind(this));
   }
