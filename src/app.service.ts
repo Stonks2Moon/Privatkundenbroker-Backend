@@ -658,7 +658,7 @@ export class AppService {
           console.log(error);
           resolve({ success: false, message: "Unhandled error! Please contact a system administrator!" });
         } else {
-          resolve({ success: true, message: "Orders has been created", additionalInfo: { DepotID: depotID, TransactionID: transactionID, BoerseOrderRefID: boerseJobRefID, OrderStatusID: orderStatusID, ShareRefID: shareRefID, OrderTypID: orderTypID, Amount: amount } });
+          resolve({ success: true, message: "Order has been created", additionalInfo: { DepotID: depotID, TransactionID: transactionID, BoerseOrderRefID: boerseJobRefID, OrderStatusID: orderStatusID, ShareRefID: shareRefID, OrderTypID: orderTypID, Amount: amount } });
         }
       });
       connection.end();
