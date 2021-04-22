@@ -594,7 +594,7 @@ export class AppService {
           // Create Rechnung
           var createRechnungResult = await this._createRechnung(getOrderByBoerseOrderRefIDResult.data.NutzerID, 2, "Wertpapierverkauf Abrechnung");
           var createRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, getOrderByBoerseOrderRefIDResult.data.Anzahl, "Wertpapier: " + getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis * getOrderByBoerseOrderRefIDResult.data.Anzahl);
-          var createFeeRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, 2, "Transaktionsgebühr", -10);
+          var createFeeRechnungPositionResult = await this._createRechnungsposition(createRechnungResult.additionalInfo.RechnungsID, 1, "Transaktionsgebühr", -10);
 
         } else { //BUY
           var addSharesToDepotResult = await this._addSharesToDepot(getOrderByBoerseOrderRefIDResult.data.Anzahl, getOrderByBoerseOrderRefIDResult.data.ShareRefID, getOrderByBoerseOrderRefIDResult.data.DepotID, getOrderByBoerseOrderRefIDResult.data.Ausfuehrungspreis);
